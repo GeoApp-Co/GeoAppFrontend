@@ -1,103 +1,103 @@
-import Image from "next/image";
+"use client";
+import { useAuth } from "@/src/hooks/useAuth";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+
+const navigation = [
+  {
+    url: "/dashboard/manifiesto",
+    text: "Lista de Servicios",
+    descripcion: "Administra los manifiestos / servicios creados",
+    role: ["admin", "conductor", 'superAdmin'],
+  },
+  {
+    url: "/dashboard/diligenciar",
+    text: "Diligenciar Manifiesto",
+    descripcion: "Llena y gestiona formularios de manifiestos",
+    role: ["admin", "conductor", "superAdmin"],
+  },
+  {
+    url: "/dashboard/cliente",
+    text: "Clientes",
+    descripcion: "Gestiona la información de los clientes",
+    role: ["admin", "superAdmin"],
+  },
+  {
+    url: "/dashboard/item",
+    text: "Items",
+    descripcion: "Administra los ítems disponibles en los manifiestos",
+    role: ["admin", "superAdmin"],
+  },
+  {
+    url: "/dashboard/plantilla",
+    text: "Plantillas",
+    descripcion: "Crea y edita plantillas predefinidas",
+    role: ["admin", "superAdmin"],
+  },
+  {
+    url: "/dashboard/usuario",
+    text: "Usuarios",
+    descripcion: "Gestiona los usuarios y sus roles",
+    role: ["superAdmin"],
+  },
+]
 
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const router = useRouter();
+  const { user} = useAuth()
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+
+
+  const handleLogout = () => {
+    localStorage.removeItem("AUTH_TOKEN");
+    router.replace("/auth/login");
+  };
+
+
+  useEffect(() => {
+    const token = localStorage.getItem("AUTH_TOKEN");
+    if (!token) {
+      router.replace("/auth/login");
+    }
+  }, [router]);
+
+  if ( user ) return (
+    <main className="max-w-6xl mx-auto px-4 py-10">
+      <h1 className="text-2xl font-bold text-center text-azul mb-8">
+        Menú Principal
+      </h1>
+      <div className="grid grid-cols-1 md:grid-cols-2  gap-6">
+        {navigation
+          .filter((option) => option.role.includes(user.rol.name))
+          .map((option, i) => (
+            <Link key={i} href={option.url}>
+              <div
+                className={`p-6 border rounded-lg shadow hover:shadow-lg transition cursor-pointer ${
+                  i % 2 === 0 ? "bg-verde text-white" : "bg-azul text-white"
+                }`}
+              >
+                <h2 className="text-lg font-semibold text-white">
+                  {option.text}
+                </h2>
+                <p className="text-sm text-white mt-1">
+                  {option.descripcion}
+                </p>
+              </div>
+            </Link>
+          ))}
+
+      </div>
+
+      <div className="text-center mt-5">
+        <button
+          onClick={handleLogout}
+          className="px-6 py-2 bg-red-600 text-white rounded shadow hover:bg-red-700 transition"
         >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+          Cerrar Sesión
+        </button>
+      </div>
+
+    </main>
   );
 }
