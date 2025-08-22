@@ -15,8 +15,6 @@ export default function ManifestSearch({ page, search, estado, fecha }: { page: 
         queryFn: () => getManifest({ page, limit, search, estado, fecha}),
     })
 
-    console.log(data);
-    
 
     return (
         <>

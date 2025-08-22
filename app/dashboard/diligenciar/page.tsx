@@ -29,7 +29,8 @@ function NewManifestPage() {
             items: [],
             photos: [],
             signature: '',
-            signatureClient: ''
+            signatureClient: '',
+            location: ''
         }
     })
 
@@ -143,6 +144,16 @@ function NewManifestPage() {
                         />
                         );
                     }}
+                />
+                </div>
+
+                <div>
+                <label className="text-azul font-bold block text-sm mb-1">Lugar</label>
+                <input
+                    type="text"
+                    {...register("location")}
+                    className="w-full bg-white px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
+                    placeholder="Lugar del servicio"
                 />
                 </div>
 

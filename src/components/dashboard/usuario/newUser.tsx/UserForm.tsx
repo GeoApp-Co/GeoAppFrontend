@@ -10,7 +10,6 @@ type UserFormProps = {
     register: UseFormRegister<NewUserFormType>;
     errors: FieldErrors<NewUserFormType>;
     isEdit?: boolean
-
 };
 
 function UserForm({ errors, register, isEdit}: UserFormProps) {

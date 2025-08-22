@@ -6,16 +6,22 @@ import { useEffect } from "react";
 
 const navigation = [
   {
-    url: "/dashboard/manifiesto",
-    text: "Lista de Servicios",
-    descripcion: "Administra los manifiestos / servicios creados",
-    role: ["admin", "conductor", 'superAdmin'],
-  },
-  {
     url: "/dashboard/diligenciar",
     text: "Diligenciar Manifiesto",
     descripcion: "Llena y gestiona formularios de manifiestos",
     role: ["admin", "conductor", "superAdmin"],
+  },
+  {
+    url: "/dashboard/manifiesto",
+    text: "Lista de Servicios",
+    descripcion: "Administra los manifiestos / servicios creados",
+    role: ["admin", "conductor", 'superAdmin', 'comercio'],
+  },
+  {
+    url: "/dashboard/manifiesto-comercial",
+    text: "Área Comercial",
+    descripcion: "Administra los manifiestos / Cotizaciones",
+    role: ["admin", "comercio", 'superAdmin'],
   },
   {
     url: "/dashboard/cliente",
@@ -46,8 +52,6 @@ const navigation = [
 export default function Home() {
   const router = useRouter();
   const { user} = useAuth()
-
-
 
   const handleLogout = () => {
     localStorage.removeItem("AUTH_TOKEN");

@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const roles = z.enum(["admin", "superAdmin", "conductor"])
+export const roles = z.enum(["admin", "superAdmin", "conductor", "comercio"])
 export const unidades = z.enum(["litro", "kg", "unidad", 'hora'])
 
 const responsePaginationSchema = z.object({
@@ -55,11 +55,12 @@ export const paginatioItemsSchema = responsePaginationSchema.pick({
     items: z.array(ItemSchema)
 })
 
-const ManifestItemSchema = z.object({
+export const ManifestItemSchema = z.object({
     id: z.number(),
     // manifestId: z.number(),
     itemId: z.number(),
     cantidad: z.string(),
+    price: z.string().nullable(),
     // createdAt: z.string(),
     // updatedAt: z.string(),
     item: ItemSchema
@@ -111,6 +112,7 @@ const ManifestTemplateSchema = z.object({
 export const ManifestSchema = z.object({
     id: z.number(),
     plate: z.string(),
+    location: z.string().nullable(),
     date: z.string(),
     signature: z.string(),
     signatureClient: z.string(),
@@ -120,11 +122,41 @@ export const ManifestSchema = z.object({
     isInvoiced: z.boolean().nullable(),
     isInternallyInvoiced: z.boolean(),
     isCertified: z.boolean(),
-    manifestItems: z.array(ManifestItemSchema),
+    manifestItems: z.array(ManifestItemSchema.pick({
+        id: true,
+        cantidad: true,
+        item: true,
+    })),
     cliente: ClienteSchema,
     user: UserSchema,
     manifestTemplate: ManifestTemplateSchema
 });
+
+export const manifestCommercialSchema = ManifestSchema.pick({
+    id: true,
+    date: true,
+    isInvoiced: true,
+    location: true,
+}).extend({
+    invoiceCode: z.string().nullable(),
+    cliente: ClienteSchema.pick({
+        id: true,
+        name: true,
+        identificacion: true,
+        identificacionType: true,
+        alias: true
+    }),
+    manifestTemplate: ManifestTemplateSchema.pick({
+        id: true,
+        name: true
+    }),
+    manifestItems: z.array(ManifestItemSchema.pick({
+        id: true,
+        cantidad: true,
+        item: true,
+        price: true
+    }))
+})
 
 export const templateSchema = z.object({
     id: z.number(),
@@ -166,4 +198,12 @@ export const paginationManifestSchema = responsePaginationSchema.pick({
     totalPages: true,
 }).extend({
     manifests: z.array(manifesPreviewtSchema)
+})
+
+export const paginationManifestCommercialSchema = responsePaginationSchema.pick({
+    currentPage: true,
+    total: true,
+    totalPages: true,
+}).extend({
+    manifests: z.array(manifestCommercialSchema)
 })

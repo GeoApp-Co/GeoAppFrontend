@@ -86,6 +86,7 @@ function UserEdit( { id } : UserEditProps) {
             <UserForm
                 register={register}
                 errors={errors}
+                isEdit={true}
             />
 
             <button

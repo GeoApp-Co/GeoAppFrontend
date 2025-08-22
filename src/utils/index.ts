@@ -57,6 +57,8 @@ export const traslateRoles = (rolName: string): string => {
                 return 'Super Administrador';
             case 'conductor':
                 return 'Conductor';
+            case 'comercio':
+                return 'Comercio';
             default:
                 return `Rol desconocido (${role})`;
         }

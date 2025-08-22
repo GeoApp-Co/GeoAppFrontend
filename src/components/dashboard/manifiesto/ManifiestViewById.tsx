@@ -71,6 +71,7 @@ function ManifiestViewById( { id } : ManifiestViewByIdProps) {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-1 text-sm text-gray-700">
                         <div><strong>Plantilla:</strong> {data.manifestTemplate.name}</div>
                         <div><strong>Placa Del Vehículo:</strong> {data.plate}</div>
+                        <div><strong>Lugar del Servicio:</strong> {data.location}</div>
                         <div><strong>Creado por:</strong> {data.user.name}</div>
                         <div><strong>CC:</strong> {data.user.cc}</div>
                         <div><strong>Fecha:</strong> {formatDateTimeLarge(data.date)}</div>
