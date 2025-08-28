@@ -1,5 +1,5 @@
 import z from "zod"
-import {  ClienteSchema, ItemSchema, manifesPreviewtSchema, manifestCommercialSchema, ManifestItemSchema, paginationManifestCommercialSchema, roles, templateSchema, unidades, userSchema } from "../schemas"
+import {  ClienteSchema, ItemSchema, manifesPreviewtSchema, manifestCommercialSchema, manifestInvoiceSchema, ManifestItemSchema, paginationManifestCommercialSchema, roles, templateSchema, unidades, userSchema } from "../schemas"
 
 export type User = {
     name: string
@@ -13,9 +13,10 @@ export type LoginForm = Pick<User, 'cc'> & {
 }
 
 export type SearchManifestForm = {
-    search: string
+    clientId: string
     fecha?: Date | null;
     estado: string
+    manifestTemplate: string;
 }
 export type SearchForm = {
     search: string
@@ -28,7 +29,14 @@ export type ManifestCommerceSearchFormData = {
     location?: string;
     item?: string;
     manifestId: string
+    quotationCode: string; 
+    isInvoiced: "" | "true" | "false";
 };
+
+export type ManifestInvoiceSearchFormData = ManifestCommerceSearchFormData & {
+    invoiceCode: string; 
+
+}
 
 export type ItemCantidad = {
     itemId: number
@@ -47,18 +55,38 @@ export type NewManifestFormType = {
     signature: string
     signatureClient: string
     location: string
+    contactClient: string;
+    positionClient: string;
 }
 
-export type InvoiceCodeFormType = {
+
+type QuotationCode = {
+    manifestId: number
+    quotationCode: string
+}
+type InvoiceCode = {
+    manifestId: number
     invoiceCode: string
 }
 
+export type QuotationCodeFormType = {
+    quotationCodes: QuotationCode[]
+}
 
+export type InvoiceCodeFormType = {
+    invoiceCodes: InvoiceCode[]
+}
 
 export type ClienteType = z.infer<typeof ClienteSchema>
+export type ClienteCellType = Pick<
+    ClienteType,
+    "id" | "name" | "alias" | "identificacion" | "personaType" | "identificacionType"
+>;
+
 export type ManifestType = z.infer<typeof manifesPreviewtSchema>
 export type ManifestItemType = z.infer<typeof ManifestItemSchema>
 export type ManifestCommerceType = z.infer<typeof manifestCommercialSchema>
+export type ManifestInvoiceType = z.infer<typeof manifestInvoiceSchema>
 export type ItemType = z.infer<typeof ItemSchema>
 export type TemplateType = z.infer<typeof templateSchema>
 export type UserType = z.infer<typeof userSchema>
@@ -71,7 +99,7 @@ export type UserType = z.infer<typeof userSchema>
 //     item
 // };
 
-export type NewClientFormType = Pick<ClienteType, 'alias' | 'contacto' | 'email' | 'identificacion' | 'identificacionType' | 'name' | 'telefono' | 'ubicacion' >
+export type NewClientFormType = Pick<ClienteType, 'alias' | 'email' | 'identificacion' | 'identificacionType' | 'name' | 'ubicacion' | 'direccion' | 'personaType' >
 export type NewItemFormType = Pick<ItemType, 'code' | 'name' | 'unidad' >
 export type NewTemplateFormType = Pick<TemplateType, 'name' > & {
     itemIds: number[]

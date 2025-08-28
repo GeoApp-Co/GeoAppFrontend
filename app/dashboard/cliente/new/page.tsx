@@ -16,16 +16,16 @@ function NewClientePage() {
 
     const initialValues : NewClientFormType = {
         alias: '',
-        contacto: '',
         email: '',
         identificacion: '',
         name: '',
-        telefono: '',
         ubicacion: '',
-        identificacionType: 'nit'
+        identificacionType: 'nit',
+        direccion: '',
+        personaType: 'juridica'
     }
 
-    const { register, handleSubmit, formState: {errors}} = useForm({
+    const { register, handleSubmit, formState: {errors}, watch} = useForm({
         defaultValues: initialValues
     })
 
@@ -64,6 +64,7 @@ function NewClientePage() {
             className="flex flex-col gap-5 mt-5"
         >
             <ClienteForm 
+                watch={watch}
                 register={register}
                 errors={errors}
             />

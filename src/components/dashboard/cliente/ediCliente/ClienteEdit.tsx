@@ -28,16 +28,16 @@ function ClienteEdit( { id } : ClienteEditProps) {
 
     const initialValues : NewClientFormType = {
         alias: '',
-        contacto: '',
         email: '',
         identificacion: '',
         name: '',
-        telefono: '',
         ubicacion: '',
-        identificacionType: 'nit'
+        identificacionType: 'nit',
+        direccion: '',
+        personaType: 'juridica'
     }
 
-    const { register, handleSubmit, formState: {errors}, reset} = useForm({
+    const { register, handleSubmit, formState: {errors}, reset, watch} = useForm({
         defaultValues: initialValues
     })
 
@@ -61,11 +61,11 @@ function ClienteEdit( { id } : ClienteEditProps) {
         if (data) {
             reset({
                 alias: data.alias || '',
-                contacto: data.contacto || '',
+                direccion: data.direccion || '',
                 email: data.email || '',
                 identificacion: data.identificacion || '',
                 name: data.name || '',
-                telefono: data.telefono || '',
+                personaType: data.personaType || 'juridica',
                 ubicacion: data.ubicacion || '',
                 identificacionType: data.identificacionType || 'nit'
             })
@@ -95,6 +95,7 @@ function ClienteEdit( { id } : ClienteEditProps) {
             className="flex flex-col gap-5 mt-5"
         >
             <ClienteForm
+                watch={watch}
                 register={register}
                 errors={errors}
             />

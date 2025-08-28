@@ -1,18 +1,77 @@
 import { z } from 'zod';
-import { roles } from '../schemas';
+import { identificacionType, personaType, roles } from '../schemas';
 import { Medidas } from '../types';
 
 type ValidRole = z.infer<typeof roles>;
+type PersonType = z.infer<typeof personaType>;
+type IdentificacionType = z.infer<typeof identificacionType>;
+
+// Traducción de tipo de persona
+export const translatePersonaType = (type: PersonType): string => {
+    const map: Record<PersonType, string> = {
+        natural: "Natural",
+        juridica: "Jurídica",
+    };
+    return map[type] ?? type;
+};
+
+// Traducción de tipo de identificación (LARGO)
+export const translateIdentificacionTypeLong = (type: IdentificacionType): string => {
+    const map: Record<IdentificacionType, string> = {
+        cc: "Cédula de ciudadanía",
+        ti: "Tarjeta de identidad",
+        ce: "Cédula de extranjería",
+        nit: "Número de identificación tributaria",
+        rc: "Registro civil",
+        pa: "Pasaporte",
+        pep: "Permiso especial de permanencia",
+        diplomatico: "Carné diplomático",
+        sinIdentificacion: "Documento extranjero sin identificación local",
+    };
+    return map[type] ?? type.toUpperCase();
+};
+
+// Traducción de tipo de identificación (CORTO)
+export const translateIdentificacionTypeShort = (type: IdentificacionType): string => {
+    const map: Record<IdentificacionType, string> = {
+        cc: "CC",
+        ti: "TI",
+        ce: "CE",
+        nit: "NIT",
+        rc: "RC",
+        pa: "PA",
+        pep: "PEP",
+        diplomatico: "DIP",
+        sinIdentificacion: "SIN-ID",
+    };
+    return map[type] ?? type.toUpperCase();
+};
+
 
 export const traslateMedidas = (unidad: Medidas) => {
     const traducciones: Record<Medidas, string> = {
         kg: "Kilogramos",
         litro: "Litros",
         unidad: "Unidad",
-        hora: "Hora"
+        hora: "Hora",
+        galones: "Galones",
+        m3: "Metro Cúbico"
     };
     return traducciones[unidad];
 };
+
+export const translateMedidasSimbolos = (unidad: Medidas): string => {
+    const simbolos: Record<Medidas, string> = {
+        kg: "KG",
+        litro: "LT",
+        unidad: "UND",
+        hora: "HR",
+        galones: "GAL",
+        m3: "M³"
+    };
+    return simbolos[unidad] || unidad;
+};
+
 
 export const formatDateTimeLarge = (dateString: string): string => {
     const date = new Date(dateString);
@@ -59,6 +118,8 @@ export const traslateRoles = (rolName: string): string => {
                 return 'Conductor';
             case 'comercio':
                 return 'Comercio';
+            case 'factura':
+                return 'Facturación';
             default:
                 return `Rol desconocido (${role})`;
         }

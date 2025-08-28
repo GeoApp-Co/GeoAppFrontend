@@ -1,14 +1,17 @@
 import { NewClientFormType } from "@/src/types";
 import ErrorMessage from "@/src/UI/ErrorMessage";
-import { FieldErrors, UseFormRegister } from "react-hook-form";
+import { FieldErrors, UseFormRegister, UseFormWatch } from "react-hook-form";
 // Ajusta la ruta si es necesario
 
 type ClienteFormProps = {
+    watch: UseFormWatch<NewClientFormType>
     register: UseFormRegister<NewClientFormType>;
     errors: FieldErrors<NewClientFormType>;
 };
 
-function ClienteForm({ errors, register }: ClienteFormProps) {
+function ClienteForm({ errors, register, watch }: ClienteFormProps) {
+
+    const tipoPersona = watch('personaType');
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Nombre */}
@@ -45,12 +48,19 @@ function ClienteForm({ errors, register }: ClienteFormProps) {
                 <select
                     {...register("identificacionType", {
                         required: "Selecciona un tipo de identificación",
+                        validate: (value) =>
+                            tipoPersona === "juridica" && value !== "nit"
+                                ? "Las personas jurídicas solo pueden tener NIT"
+                                : true,
                     })}
                     className="w-full bg-white px-4 py-2 border border-gray-300 rounded-lg"
                 >
                     <option value="">Selecciona una opción</option>
                     <option value="cc">Cédula de ciudadanía</option>
                     <option value="nit">NIT</option>
+                    <option value="ti">Tarjeta de identidad</option>
+                    <option value="ce">Cédula de extranjería</option>
+                    <option value="pasaporte">Pasaporte</option>
                 </select>
                 {errors.identificacionType && <ErrorMessage>{errors.identificacionType.message}</ErrorMessage>}
             </div>
@@ -67,6 +77,22 @@ function ClienteForm({ errors, register }: ClienteFormProps) {
                     placeholder="Número de identificación"
                 />
                 {errors.identificacion && <ErrorMessage>{errors.identificacion.message}</ErrorMessage>}
+            </div>
+
+             {/* Tipo de persona */}
+            <div>
+                <label className="text-azul font-bold block text-sm mb-1">Tipo de persona</label>
+                <select
+                    {...register("personaType", {
+                        required: "Selecciona el tipo de persona",
+                    })}
+                    className="w-full bg-white px-4 py-2 border border-gray-300 rounded-lg"
+                >
+                    <option value="">Selecciona una opción</option>
+                    <option value="natural">Persona Natural</option>
+                    <option value="juridica">Persona Jurídica</option>
+                </select>
+                {errors.personaType && <ErrorMessage>{errors.personaType.message}</ErrorMessage>}
             </div>
 
             {/* Email */}
@@ -87,38 +113,6 @@ function ClienteForm({ errors, register }: ClienteFormProps) {
                 {errors.email && <ErrorMessage>{errors.email.message}</ErrorMessage>}
             </div>
 
-            {/* Contacto */}
-            <div>
-                <label className="text-azul font-bold block text-sm mb-1">Persona de contacto</label>
-                <input
-                    type="text"
-                    {...register("contacto", {
-                        required: "El nombre del contacto es obligatorio",
-                    })}
-                    className="w-full bg-white px-4 py-2 border border-gray-300 rounded-lg"
-                    placeholder="Nombre del contacto"
-                />
-                {errors.contacto && <ErrorMessage>{errors.contacto.message}</ErrorMessage>}
-            </div>
-
-            {/* Teléfono */}
-            <div>
-                <label className="text-azul font-bold block text-sm mb-1">Teléfono</label>
-                <input
-                    type="tel"
-                    {...register("telefono", {
-                        required: "El teléfono es obligatorio",
-                        pattern: {
-                            value: /^[0-9]+$/,
-                            message: "Solo se permiten números",
-                        },
-                    })}
-                    className="w-full bg-white px-4 py-2 border border-gray-300 rounded-lg"
-                    placeholder="Teléfono"
-                />
-                {errors.telefono && <ErrorMessage>{errors.telefono.message}</ErrorMessage>}
-            </div>
-
             {/* Ubicación */}
             <div>
                 <label className="text-azul font-bold block text-sm mb-1">Ubicación</label>
@@ -131,6 +125,20 @@ function ClienteForm({ errors, register }: ClienteFormProps) {
                     placeholder="Departamento o ciudad"
                 />
                 {errors.ubicacion && <ErrorMessage>{errors.ubicacion.message}</ErrorMessage>}
+            </div>
+
+            {/* Dirección */}
+            <div className="md:col-span-2">
+                <label className="text-azul font-bold block text-sm mb-1">Dirección</label>
+                <input
+                    type="text"
+                    {...register("direccion", {
+                        required: "La dirección es obligatoria",
+                    })}
+                    className="w-full bg-white px-4 py-2 border border-gray-300 rounded-lg"
+                    placeholder="Dirección exacta"
+                />
+                {errors.direccion && <ErrorMessage>{errors.direccion.message}</ErrorMessage>}
             </div>
         </div>
     );

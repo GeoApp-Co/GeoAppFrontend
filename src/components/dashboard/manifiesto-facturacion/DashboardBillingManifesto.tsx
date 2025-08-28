@@ -1,58 +1,52 @@
 "use client"
-import { getCommercialManifest, updateManifestQuotationCode } from "@/src/api/manifestApi"
-import { ManifestCommerceSearchFormData } from "@/src/types"
-import Heading from "@/src/UI/Heading"
-import { useMutation, useQuery } from "@tanstack/react-query"
-import { useState } from "react"
-import ManifestCommercePagination from "./ManifestCommercePagination"
-import ManifestCommercialSearchForm from "./ManifestCommercialSearchForm"
-import ManifestCommercialTable from "./ManifestCommercialTable"
+import { ManifestCommerceSearchFormData, ManifestInvoiceSearchFormData } from '@/src/types'
+import Heading from '@/src/UI/Heading'
+import React, { useState } from 'react'
+import { selectedItem, selectedManifest } from '../manifiesto-comercial/DashboardCommercialManifesto'
+import { useMutation, useQuery } from '@tanstack/react-query'
+import { getInvoiceManifest, updateManifestInvoiceCode } from '@/src/api/manifestApi'
+import ManifestInvoicePagination from './ManifestInvoicePagination'
+import { Button } from '@mui/material'
 
 import SaveIcon from '@mui/icons-material/Save'
-import { Button } from "@mui/material"
-import { toast } from "react-toastify"
+import ManifestInvoiceTable from './ManifestInvoiceTable'
+import { toast } from 'react-toastify'
+import ManifestInvoiceSearchForm from './ManifestInvoiceSearchForm'
 
-type DashboardCommercialManifestoProps = {
+type DashboardBillingManifestoProps = {
     page: number
 }
 
-export type selectedItem = {
-    id: number
-    cantidad: number
+export type selectedManifestInvoice = Pick<selectedManifest, 'id' | 'items'> & {
+    invoiceCode: string
 }
 
-export type selectedManifest ={
-    id: number
-    quotationCode: string | null
-    items: selectedItem[]
-}
-
-
-
-function DashboardCommercialManifesto({ page }: DashboardCommercialManifestoProps) {
+function DashboardBillingManifesto( { page } : DashboardBillingManifestoProps) {
     const limit = 20
 
     // 🟢 estado para los filtros (inicia vacío)
-    const [filters, setFilters] = useState<ManifestCommerceSearchFormData>({
+    const [filters, setFilters] = useState<ManifestInvoiceSearchFormData>({
         clientId: '',
         fechaMes: null,
         item: '',
         location: '',
         manifestId: '',
         manifestTemplate: '',
+        invoiceCode: '',
         quotationCode: '',
         isInvoiced: ''
     })
 
-    const [selected, setSelected] = useState<selectedManifest[]>([]);
+    const [selected, setSelected] = useState<selectedManifestInvoice[]>([]);
 
     const { data, isLoading, refetch } = useQuery({
-        queryKey: ['manifestsCommerce', page, limit, filters], // 👈 depende de los filtros
-        queryFn: () => getCommercialManifest({ page, limit, ...filters }),
+        queryKey: ['manifestsInvoice', page, limit, filters], // 👈 depende de los filtros
+        queryFn: () => getInvoiceManifest({ page, limit, ...filters }),
     })
 
+
     const { mutate, isPending } = useMutation({
-        mutationFn: updateManifestQuotationCode,
+        mutationFn: updateManifestInvoiceCode,
         onError(data) {
             toast.error(data.message)
         },
@@ -62,7 +56,6 @@ function DashboardCommercialManifesto({ page }: DashboardCommercialManifestoProp
         },
     })
 
-    // ✅ Seleccionar/deseleccionar todo el manifiesto
     const handleToggleManifest = (
         manifestId: number,
         items: selectedItem[]
@@ -72,7 +65,7 @@ function DashboardCommercialManifesto({ page }: DashboardCommercialManifestoProp
 
         if (manifestIndex === -1) {
         // 🚀 No existe → lo agregamos con todos los items
-        return [...prev, { id: manifestId, quotationCode: '', items }];
+        return [...prev, { id: manifestId, invoiceCode: '', items }];
         }
 
         const newSelected = [...prev];
@@ -83,7 +76,7 @@ function DashboardCommercialManifesto({ page }: DashboardCommercialManifestoProp
             newSelected.splice(manifestIndex, 1);
         } else {
         // ✅ Reemplazamos con todos los items (incluyendo price)
-            newSelected[manifestIndex] = { id: manifestId, items, quotationCode: ''};
+            newSelected[manifestIndex] = { id: manifestId, items, invoiceCode: ''};
         }
 
         return newSelected;
@@ -100,7 +93,7 @@ function DashboardCommercialManifesto({ page }: DashboardCommercialManifestoProp
 
         if (manifestIndex === -1) {
         // 🚀 No existe → agregamos este item
-        return [...prev, { id: manifestId, quotationCode: '', items: [item] }];
+        return [...prev, { id: manifestId, invoiceCode: '', items: [item] }];
         }
 
         const newSelected = [...prev];
@@ -129,14 +122,25 @@ function DashboardCommercialManifesto({ page }: DashboardCommercialManifestoProp
     };
 
     // ✅ Cambiar precio en TODOS los seleccionados
-    const handleQuotationCodeChange = (newQuotationCode: string) => {
+    const handleInvoiceCodeChange = (newInvoiceCode: string) => {
         setSelected(prev =>
             prev.map(manifest => ({
             ...manifest,
-            quotationCode: newQuotationCode
-            }))
+            invoiceCode: newInvoiceCode
+            })) 
         );
     };
+
+    const handleUpdateInvoiceCodes = () => {
+        const invoiceCodes = selected.flatMap(manifest =>
+            ({
+                manifestId: manifest.id,
+                invoiceCode: manifest.invoiceCode || ''
+            })
+        );
+
+        mutate({InvoiceCodeFormData:  {invoiceCodes}})
+    }
 
 
     const totalCantidad = selected.reduce(
@@ -152,11 +156,11 @@ function DashboardCommercialManifesto({ page }: DashboardCommercialManifestoProp
 
     return (
         <div>
-            <Heading>Lista de Servicios - (Área de Comercio)</Heading>
+            <Heading>Lista de Servicios - (Área de Facturación)</Heading>
 
             <div className="grid grid-cols-1 gap-3 mt-5 ">
                 {/* Pasamos setFilters para que el form lo actualice */}
-                <ManifestCommercialSearchForm setFilters={setFilters} />
+                <ManifestInvoiceSearchForm setFilters={setFilters} />
             </div>
 
             {isLoading && (
@@ -172,7 +176,6 @@ function DashboardCommercialManifesto({ page }: DashboardCommercialManifestoProp
             )}
 
             {data && data.manifests.length > 0 &&
-
                 <div className="w-full overflow-x-auto rounded-md shadow py-5 flex flex-col gap-2">
                 <Button
                     variant="contained"
@@ -180,42 +183,32 @@ function DashboardCommercialManifesto({ page }: DashboardCommercialManifestoProp
                     size="small"
                     disabled={isPending || selected.length === 0}
                     startIcon={<SaveIcon />}
-                    onClick={() => {
-                        // construimos payload
-                        const quotationCodes = selected.flatMap(manifest =>
-                            ({
-                                manifestId: manifest.id,
-                                quotationCode: manifest.quotationCode || ''
-                            })
-                        );
-
-                        mutate({quotationCodeFormType:  {quotationCodes}})
-                        
-                    }}
-                    >
-                    Guardar Número de Cotización
+                    onClick={handleUpdateInvoiceCodes}
+                >
+                    Guardar Número de Facturación
                 </Button>
-                <ManifestCommercialTable 
+                <ManifestInvoiceTable
+                    manifests={data.manifests}
                     selected={selected}
-                    onToggleItem={handleToggleItem}
+                    onInvoiceCodeChange={handleInvoiceCodeChange}
                     onToggleManifest={handleToggleManifest}
-                    onQuotationCodeChange={handleQuotationCodeChange}
-                    manifests={data.manifests} 
+                    onToggleItem={handleToggleItem}
                     refetch={refetch}
-                    totalItems={totalItems}
                     totalCantidad={totalCantidad}
+                    totalItems={totalItems}
                 />
                 </div>
             }
 
-            {data &&
-                <ManifestCommercePagination
+            {data && 
+                <ManifestInvoicePagination
                     page={data.currentPage}
                     totalPages={data.totalPages}
                 />
             }
+        
         </div>
     )
 }
 
-export default DashboardCommercialManifesto
+export default DashboardBillingManifesto

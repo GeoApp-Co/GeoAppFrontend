@@ -1,3 +1,4 @@
+
 import { isAxiosError } from "axios";
 import api from "../config/axios";
 import { ClienteSchema, paginationClientesSchema } from "../schemas";
@@ -23,6 +24,8 @@ export async function getSelectClient( { search, limit, page  } : Pick<ClientTyp
         })
 
         const response = paginationClientesSchema.safeParse(data)
+        console.log(response);
+        
 
         if (response.success) {
             return response.data

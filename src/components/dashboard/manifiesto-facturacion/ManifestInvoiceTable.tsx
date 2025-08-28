@@ -1,6 +1,6 @@
 "use client";
 
-import { ManifestCommerceType, PaginationManifestCommercialType } from "@/src/types";
+import { ManifestCommerceType, ManifestInvoiceType, PaginationManifestCommercialType } from "@/src/types";
 import { formatDateTimeLarge, formatNumber, traslateMedidas } from "@/src/utils";
 import CloseIcon from '@mui/icons-material/Close';
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
@@ -24,17 +24,18 @@ import {
 } from "@mui/material";
 import { QueryObserverResult, RefetchOptions } from "@tanstack/react-query";
 import * as React from "react";
-import { selectedItem, selectedManifest } from "./DashboardCommercialManifesto";
-import InvoiceStatusCell from "./InvoiceStatusCell";
-import ManifestInputUpdate from "./ManifestInputUpdate";
+import { selectedManifestInvoice } from "./DashboardBillingManifesto";
+import { selectedItem } from "../manifiesto-comercial/DashboardCommercialManifesto";
+import ManifestInputInvoiceUpdate from "./ManifestInputInvoiceUpdate";
+import EditLockButton from "./EditLockButton";
 
 
-type ManifestCommercialTableProps = {
-    manifests: ManifestCommerceType[];
-    selected: selectedManifest[]
+type ManifestInvoiceTableProps = {
+    manifests: ManifestInvoiceType[];
+    selected: selectedManifestInvoice[]
     onToggleManifest: (manifestId: number, items: selectedItem[]) => void
     onToggleItem: (manifestId: number, item: selectedItem) => void
-    onQuotationCodeChange: (newQuotationCode: string) => void
+    onInvoiceCodeChange: (newInvoiceCode: string) => void
     refetch: (options?: RefetchOptions | undefined) => Promise<QueryObserverResult<PaginationManifestCommercialType | undefined, Error>>
     totalItems: number
     totalCantidad: number
@@ -52,15 +53,15 @@ function Row({
     selected,
     onToggleManifest,
     onToggleItem,
-    onQuotationCodeChange,
+    onInvoiceCodeChange,
     refetch,
     index
 }: {
-    row: ManifestCommerceType;
-    selected: selectedManifest[]
+    row: ManifestInvoiceType;
+    selected: selectedManifestInvoice[]
     onToggleManifest: (manifestId: number, items: selectedItem[]) => void
     onToggleItem: (manifestId: number, item: selectedItem) => void
-    onQuotationCodeChange: (newQuotationCode: string) => void
+    onInvoiceCodeChange: (newInvoiceCode: string) => void
     refetch: (options?: RefetchOptions | undefined) => Promise<QueryObserverResult<PaginationManifestCommercialType | undefined, Error>>
     index: number
 }) {
@@ -142,13 +143,21 @@ function Row({
                     </Stack>
                 )}
             </TableCell>
+            <TableCell>{row.quotationCode}</TableCell>
             <TableCell>
-                <ManifestInputUpdate
-                    quotationCode={
-                        manifestSelected ? manifestSelected.quotationCode : row.quotationCode // usa lo que está en selected
+                <ManifestInputInvoiceUpdate
+                    invoiceCode={
+                        manifestSelected ? manifestSelected.invoiceCode : row.invoiceCode // usa lo que está en selected
                     }
-                    onQuotationCodeChange={onQuotationCodeChange} 
+                    onInvoiceCodeChange={onInvoiceCodeChange} 
                     disabled={!manifestSelected}
+                />
+            </TableCell>
+            <TableCell>
+                <EditLockButton
+                    isEdit={row.isEdit}
+                    manifestId={row.id}
+                    refetch={refetch}
                 />
             </TableCell>
         </TableRow>
@@ -159,7 +168,7 @@ function Row({
             backgroundColor: index % 2 === 0 ? "#f3f4f6" : "#ffffff", // un poquito más sombreado para distinguir items
             }}
         >
-            <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={9}>
+            <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={11}>
             <Collapse in={open} timeout="auto" unmountOnExit>
                 <Box sx={{ margin: 1 }}>
                 <Table size="small" aria-label="items">
@@ -199,11 +208,19 @@ function Row({
                         <TableCell>{item.item.name}</TableCell>
                         <TableCell>{traslateMedidas(item.item.unidad)}</TableCell>
                         <TableCell>
-                            <InvoiceStatusCell
-                                isInvoiced={item.isInvoiced}
-                                manifestItemId={item.id}
-                                refetch={refetch}
-                            />
+                            {item.isInvoiced ? (
+                            <>
+                                <Typography variant="body2" color="success.main">
+                                Facturar
+                                </Typography>
+                            </>
+                            ) : (
+                            <>
+                                <Typography variant="body2" color="error.main">
+                                ----
+                                </Typography>
+                            </>
+                            )}
                         </TableCell>
                         <TableCell align="right">{item.cantidad}</TableCell>
                         </TableRow>
@@ -218,7 +235,7 @@ function Row({
     );
 }
 
-function ManifestCommercialTable({ selected, onToggleItem, onToggleManifest, onQuotationCodeChange, manifests, refetch, totalCantidad, totalItems }: ManifestCommercialTableProps) {
+function ManifestInvoiceTable({ manifests, refetch, totalCantidad, totalItems, onInvoiceCodeChange, onToggleItem, onToggleManifest, selected }: ManifestInvoiceTableProps) {
 
 
 
@@ -248,6 +265,8 @@ function ManifestCommercialTable({ selected, onToggleItem, onToggleManifest, onQ
                 <TableCell sx={headerStyle}>Ubicación</TableCell>
                 <TableCell sx={headerStyle}>Facturado</TableCell>
                 <TableCell sx={headerStyle}>#-Cotización</TableCell>
+                <TableCell sx={headerStyle}>#-Facturación</TableCell>
+                <TableCell sx={headerStyle}>¿Es Editable?</TableCell>
                 </TableRow>
             </TableHead>
                 <TableBody>
@@ -258,7 +277,7 @@ function ManifestCommercialTable({ selected, onToggleItem, onToggleManifest, onQ
                         selected={selected}
                         onToggleManifest={onToggleManifest}
                         onToggleItem={onToggleItem}
-                        onQuotationCodeChange={onQuotationCodeChange}
+                        onInvoiceCodeChange={onInvoiceCodeChange}
                         refetch={refetch}
                         index={index}
                     />
@@ -285,4 +304,4 @@ function ManifestCommercialTable({ selected, onToggleItem, onToggleManifest, onQ
     );
 }
 
-export default ManifestCommercialTable;
+export default ManifestInvoiceTable;

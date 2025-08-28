@@ -3,19 +3,22 @@ import { getManifestById } from "@/src/api/manifestApi"
 import Divider from "@/src/UI/Divider"
 import GoBackButton from "@/src/UI/GoBackButton"
 import LoaderPage from "@/src/UI/loaders/LoaderPage"
-import { formatDateTimeLarge, formatNumber, traslateMedidas } from "@/src/utils"
+import { formatDateTimeLarge, formatNumber, traslateMedidas, traslateRoles } from "@/src/utils"
 import { Disclosure, DisclosureButton, DisclosurePanel } from "@headlessui/react"
 import { ChevronDownIcon } from '@heroicons/react/20/solid'
 import { useQuery } from "@tanstack/react-query"
 import Image from "next/image"
 import { notFound } from "next/navigation"
 import ClientCard from "./ClientCard"
+import { useAuth } from "@/src/hooks/useAuth"
 
 type ManifiestViewByIdProps = {
     id: string
 }
 
 function ManifiestViewById( { id } : ManifiestViewByIdProps) {
+
+    const { user } = useAuth()
 
     const { data, isLoading} = useQuery({
         queryKey: ['manifiest', id],
@@ -72,8 +75,6 @@ function ManifiestViewById( { id } : ManifiestViewByIdProps) {
                         <div><strong>Plantilla:</strong> {data.manifestTemplate.name}</div>
                         <div><strong>Placa Del Vehículo:</strong> {data.plate}</div>
                         <div><strong>Lugar del Servicio:</strong> {data.location}</div>
-                        <div><strong>Creado por:</strong> {data.user.name}</div>
-                        <div><strong>CC:</strong> {data.user.cc}</div>
                         <div><strong>Fecha:</strong> {formatDateTimeLarge(data.date)}</div>
                         <div className="md:col-span-2"><strong>Observaciones:</strong> {data.observations || "Ninguna"}</div>
                     </div>
@@ -155,35 +156,40 @@ function ManifiestViewById( { id } : ManifiestViewByIdProps) {
 
         <div className="mt-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {/* Cliente */}
                 <div>
-                <h3 className="text-lg font-medium mb-2 text-azul  ">Firma Cliente</h3>
-                <div
-                    className="border rounded w-full aspect-[3/1]  mt-2 relative"
-                >
-                    <Image
-                        src={data.signatureClient}
-                        alt="Firma digital"
-                        fill
-                    />
-    
+                <h3 className="text-lg font-medium mb-2 text-azul">Firma del Contacto / Cliente</h3>
+                <div className="border rounded w-full aspect-[3/1] mt-2 relative">
+                    <Image src={data.signatureClient} alt="Firma Cliente" fill />
+                </div>
+
+                <div className="mt-3">
+                    <label className="text-sm font-semibold text-gray-600 block mb-1">Nombre del contacto</label>
+                    <p className="bg-gray-100 px-4 py-2 rounded text-sm">{data.contactClient || "No registrado"}</p>
+                </div>
+
+                <div className="mt-3">
+                    <label className="text-sm font-semibold text-gray-600 block mb-1">Cargo del contacto</label>
+                    <p className="bg-gray-100 px-4 py-2 rounded text-sm">{data.positionClient || "No registrado"}</p>
                 </div>
                 </div>
+
+                {/* Conductor */}
                 <div>
-                <h3 className="text-lg font-medium mb-2 text-azul  ">Firma Conductor</h3>
-                <div
-                    className="border rounded w-full aspect-[3/1]  mt-2 relative"
-                >
-                    <Image
-                        src={data.signature}
-                        alt="Firma digital"
-                        fill
-                    />
-    
+                <h3 className="text-lg font-medium mb-2 text-azul">Firma del Diligenciador</h3>
+                <div className="border rounded w-full aspect-[3/1] mt-2 relative">
+                    <Image src={data.signature} alt="Firma Conductor" fill />
                 </div>
+
+                <div className="mt-3">
+                    <label className="text-sm font-semibold text-gray-600 block mb-1">Nombre del diligenciador</label>
+                    <p className="bg-gray-100 px-4 py-2 rounded text-sm">{data.user?.name || "No registrado"}</p>
+                </div>
+
                 </div>
             </div>
-            
         </div>
+
 
 
         </div>

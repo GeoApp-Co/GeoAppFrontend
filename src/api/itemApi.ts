@@ -9,6 +9,7 @@ type ItemType = {
     page?: number,
     formData: NewItemFormType
     itemId: string
+    manifestItemId: number
 }
 
 export async function getItems( { limit, page, search } : Pick<ItemType, 'limit' | 'page' | 'search'>) {
@@ -76,6 +77,21 @@ export async function updateItem( { itemId, formData } : Pick<ItemType, 'itemId'
         try {
         const url = `/items/${itemId}`
         const {data} = await api.put<string>(url, formData)
+
+        return data
+
+    } catch (error) {
+        if (isAxiosError(error) && error.response) {
+            console.log(error);
+            throw new Error(error.response.data.error);
+        }
+    }
+}
+
+export async function updateInvoiceStatusItem( { manifestItemId } : Pick<ItemType, 'manifestItemId'>) {
+        try {
+        const url = `/items/${manifestItemId}/inVoice-status`
+        const {data} = await api.put<string>(url)
 
         return data
 

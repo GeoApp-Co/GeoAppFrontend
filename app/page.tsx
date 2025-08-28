@@ -15,7 +15,7 @@ const navigation = [
     url: "/dashboard/manifiesto",
     text: "Lista de Servicios",
     descripcion: "Administra los manifiestos / servicios creados",
-    role: ["admin", "conductor", 'superAdmin', 'comercio'],
+    role: ["admin", "conductor", 'superAdmin', 'comercio', 'factura'],
   },
   {
     url: "/dashboard/manifiesto-comercial",
@@ -24,10 +24,16 @@ const navigation = [
     role: ["admin", "comercio", 'superAdmin'],
   },
   {
+    url: "/dashboard/manifiesto-facturacion",
+    text: "Área de Facturacion",
+    descripcion: "Administra los manifiestos / Facturación",
+    role: ["admin", "factura", 'superAdmin'],
+  },
+  {
     url: "/dashboard/cliente",
     text: "Clientes",
     descripcion: "Gestiona la información de los clientes",
-    role: ["admin", "superAdmin"],
+    role: ["admin", "superAdmin", 'comercio'],
   },
   {
     url: "/dashboard/item",

@@ -1,6 +1,6 @@
 "use client";
 import { getSelectTemplates } from "@/src/api/templateApi";
-import { ManifestCommerceSearchFormData } from "@/src/types";
+import { ManifestInvoiceSearchFormData } from "@/src/types";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { Accordion, AccordionDetails, AccordionSummary, Typography } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
@@ -9,25 +9,28 @@ import { useEffect, useMemo } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { Controller, useForm } from "react-hook-form";
-import ClientSelectInput from "./ClientSelectInput";
+import ClientSelectInput from "../manifiesto-comercial/ClientSelectInput";
 
 type Props = {
-    setFilters: (filters: ManifestCommerceSearchFormData) => void;
+    setFilters: (filters: ManifestInvoiceSearchFormData) => void;
 };
 
-function ManifestCommercialSearchForm({ setFilters }: Props) {
+function ManifestInvoiceSearchForm({ setFilters }: Props) {
     const { data } = useQuery({
         queryKey: ["templates"],
         queryFn: () => getSelectTemplates({ search: "" }),
     });
 
-    const { register, control, watch, reset, setValue} = useForm<ManifestCommerceSearchFormData>({
+    const { register, control, watch, reset, setValue} = useForm<ManifestInvoiceSearchFormData>({
         defaultValues: {
-        clientId: "",
-        fechaMes: null,
-        manifestTemplate: "",
-        location: "",
-        item: "",
+            clientId: "",
+            fechaMes: null,
+            manifestTemplate: "",
+            location: "",
+            item: "",
+            invoiceCode: '',
+            quotationCode: '',
+            manifestId: ''
         },
     });
 
@@ -35,10 +38,11 @@ function ManifestCommercialSearchForm({ setFilters }: Props) {
 
     const debouncedUpdate = useMemo(
         () =>
-        debounce((values: ManifestCommerceSearchFormData) => {
-            const newFilters: ManifestCommerceSearchFormData = {
+        debounce((values: ManifestInvoiceSearchFormData) => {
+            const newFilters: ManifestInvoiceSearchFormData = {
                 clientId: values.clientId || "",
-                quotationCode: values.quotationCode || '',
+                invoiceCode: values.invoiceCode || '',
+                quotationCode: '',
                 fechaMes: values.fechaMes || null,
                 manifestTemplate: values.manifestTemplate || "",
                 location: values.location || "",
@@ -82,8 +86,8 @@ function ManifestCommercialSearchForm({ setFilters }: Props) {
             </div> */}
 
             <ClientSelectInput
-                setValueCommerce={setValue} 
-                watchCommerce={watch}
+                setValueInvoice={setValue} 
+                watchInvoice={watch}
             />
 
             <div>
@@ -93,6 +97,17 @@ function ManifestCommercialSearchForm({ setFilters }: Props) {
                 {...register("manifestId")}
                 placeholder="Id, Secuencia del Manifiesto"
                 className="w-full bg-white px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-azul focus:border-azul outline-none transition-all"
+                />
+            </div>
+
+            {/* Invoice Code */}
+            <div>
+                <label className="text-azul font-bold block text-sm mb-1">Código de Factura</label>
+                <input
+                    type="text"
+                    {...register("invoiceCode")}
+                    placeholder="Buscar por código de factura"
+                    className="w-full bg-white px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-azul focus:border-azul outline-none transition-all"
                 />
             </div>
 
@@ -191,6 +206,7 @@ function ManifestCommercialSearchForm({ setFilters }: Props) {
                     item: "",
                     manifestId: "",
                     quotationCode: "",
+                    invoiceCode: '',
                     isInvoiced: ''
                 });
                 }}
@@ -204,4 +220,4 @@ function ManifestCommercialSearchForm({ setFilters }: Props) {
     );
 }
 
-export default ManifestCommercialSearchForm;
+export default ManifestInvoiceSearchForm;

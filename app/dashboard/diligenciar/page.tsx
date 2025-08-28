@@ -13,11 +13,14 @@ import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { createManifest } from "@/src/api/manifestApi"
 import { toast } from "react-toastify"
 import { useRouter } from "next/navigation"
+import { useAuth } from "@/src/hooks/useAuth"
+import { traslateRoles } from "@/src/utils"
 
 function NewManifestPage() {
 
     const queryClient = useQueryClient()
     const router = useRouter()
+    const { user } = useAuth()
 
     const methods = useForm<NewManifestFormType>({
         defaultValues: {
@@ -30,7 +33,9 @@ function NewManifestPage() {
             photos: [],
             signature: '',
             signatureClient: '',
-            location: ''
+            location: '',
+            contactClient: '',
+            positionClient: ''
         }
     })
 
@@ -71,6 +76,12 @@ function NewManifestPage() {
 
         if (!formData.plate || formData.plate.trim() === "") {
             errors.push("La placa no puede estar vacía.")
+        }
+        if (!formData.contactClient || formData.plate.trim() === "") {
+            errors.push("La Nombre del contacto no puede estar vacío.")
+        }
+        if (!formData.positionClient || formData.positionClient.trim() === "") {
+            errors.push("La posición del contacto no puedeestar vacio.")
         }
 
         if (!formData.signature || formData.signature.trim() === "") {
@@ -181,18 +192,58 @@ function NewManifestPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
 
                 <div>
-                <label className="text-azul font-bold block text-sm mb-1">Firma del Conductor</label>
+                    <label className="text-azul font-bold block text-sm mb-1">Firma del Conductor</label>
                     <ButtonSignature
                         input={'signature'}
-                    />  
+                    /> 
+                    <div className="mt-3">
+                        <label className="text-azul font-bold block text-sm mb-1">Nombre del diligenciador</label>
+                        <input
+                        type="text"
+                        disabled={true}
+                        value={user?.name || 'Sin Sesión Activa'}
+                        className="w-full bg-white px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
+                        placeholder="Nombre del contacto"
+                        />
+                    </div>
+
+                    <div className="mt-3">
+                        <label className="text-azul font-bold block text-sm mb-1">Cargo del diligenciador</label>
+                        <input
+                        type="text"
+                        value={traslateRoles(user?.rol.name || '')}
+                        disabled={true}
+                        className="w-full bg-white px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
+                        placeholder="Cargo del contacto"
+                        />
+                    </div>
                 </div>
 
                 <div>
                 <label className="text-azul font-bold block text-sm mb-1">Firma del Cliente</label>
-                    <ButtonSignature
-                        input={'signatureClient'}
-                    />  
+                <ButtonSignature input={'signatureClient'} />
+
+                <div className="mt-3">
+                    <label className="text-azul font-bold block text-sm mb-1">Nombre del contacto del cliente</label>
+                    <input
+                    type="text"
+                    {...register("contactClient")}
+                    className="w-full bg-white px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
+                    placeholder="Nombre del contacto"
+                    />
                 </div>
+
+                <div className="mt-3">
+                    <label className="text-azul font-bold block text-sm mb-1">Cargo del contacto del cliente</label>
+                    <input
+                    type="text"
+                    {...register("positionClient")}
+                    className="w-full bg-white px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
+                    placeholder="Cargo del contacto"
+                    />
+                </div>
+                </div>
+                
             </div>
             
 

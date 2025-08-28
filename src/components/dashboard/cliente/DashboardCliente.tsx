@@ -30,12 +30,13 @@ function DashboardCliente( { page } :  DashboardClienteProps) {
     }
 
     useEffect(() => {
-        if (user?.rol.name !== 'admin' && user?.rol.name !== 'superAdmin') {
+        if (user?.rol.name !== 'admin' && user?.rol.name !== 'superAdmin' && user?.rol.name !== 'comercio') {
             router.replace('/')
         }
     }, [router, user])
     
 
+    
     return (
         <>
             <Heading>Lista de Clientes</Heading>

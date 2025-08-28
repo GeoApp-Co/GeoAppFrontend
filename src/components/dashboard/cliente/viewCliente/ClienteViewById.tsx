@@ -4,68 +4,78 @@ import { getClienteById } from "@/src/api/clientApi"
 import LoaderPage from "@/src/UI/loaders/LoaderPage"
 import { useQuery } from "@tanstack/react-query"
 import { notFound } from "next/navigation"
-import ClientCard from "../../manifiesto/ClientCard"
-import { Disclosure, DisclosureButton, DisclosurePanel } from "@headlessui/react"
-import { ChevronDownIcon } from "@heroicons/react/20/solid"
 import GoBackButton from "@/src/UI/GoBackButton"
+import { translateIdentificacionTypeLong, translatePersonaType } from "@/src/utils"
 
-type  ClienteViewByIdProps = {
+
+type ClienteViewByIdProps = {
     id: string
 }
 
-function ClienteViewById( { id } : ClienteViewByIdProps) {
-
+function ClienteViewById({ id }: ClienteViewByIdProps) {
     const { data, isLoading } = useQuery({
-        queryKey:[ 'cliente', id],
-        queryFn: () => getClienteById({clienteId: id})
+        queryKey: ["cliente", id],
+        queryFn: () => getClienteById({ clienteId: id }),
     })
 
-    if (isLoading) return <LoaderPage/>
-    
+    if (isLoading) return <LoaderPage />
+
     if (!data && !isLoading) {
         notFound()
     }
-        
 
     return (
-        <div className="max-w-4xl mx-auto mt-10 p-3 bg-white shadow-lg rounded-md space-y-3">
-        
-        <div className="flex justify-between">
+        <div className="max-w-4xl mx-auto mt-10 p-3 bg-white shadow-lg rounded-md space-y-6">
+            {/* Header con botón atrás */}
+            <div className="flex justify-between">
+                <h1 className="text-lg font-semibold text-azul">Detalle del Cliente</h1>
+                <GoBackButton />
+            </div>
 
-            <span></span>
-            <GoBackButton/> 
+            {/* Card de datos del cliente */}
+            {data && (
+                <div className="bg-blue-50 p-5 rounded-lg shadow-sm border border-gray-200">
+                    <h2 className="text-azul font-medium text-base mb-4">Datos del Cliente</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        <div>
+                            <p className="font-semibold text-gray-700">Nombre</p>
+                            <p className="text-gray-600">{data.name}</p>
+                        </div>
+                        <div>
+                            <p className="font-semibold text-gray-700">Alias</p>
+                            <p className="text-gray-600">{data.alias}</p>
+                        </div>
+                        <div>
+                            <p className="font-semibold text-gray-700">Tipo de Persona</p>
+                            <p className="text-gray-600">{translatePersonaType(data.personaType)}</p>
+                        </div>
+                        <div>
+                            <p className="font-semibold text-gray-700">Identificación</p>
+                            <p className="text-gray-600">
+                                {translateIdentificacionTypeLong(data.identificacionType)} {data.identificacion}
+                            </p>
+                        </div>
+                        <div>
+                            <p className="font-semibold text-gray-700">Correo</p>
+                            <p className="text-gray-600">{data.email}</p>
+                        </div>
+                        <div>
+                            <p className="font-semibold text-gray-700">Ubicación</p>
+                            <p className="text-gray-600">{data.ubicacion}</p>
+                        </div>
+                        <div className="md:col-span-2">
+                            <p className="font-semibold text-gray-700">Dirección</p>
+                            <p className="text-gray-600">{data.direccion}</p>
+                        </div>
+                    </div>
+                </div>
+            )}
 
-        </div>
-
-
-        {data &&
-            <Disclosure as="div" defaultOpen className="">
-                <DisclosureButton
-                    className="group flex w-full items-center justify-between"
-                >
-                    <span className="py-2 text-left w-full font-medium text-azul">Datos del Cliente</span>
-                    <ChevronDownIcon className="size-5 fill-azul/60 group-data-hover:fill-azul/50 group-data-open:rotate-180" />
-                </DisclosureButton>
-                <DisclosurePanel className="px-4 pt-4 pb-2 text-sm text-gray-700">
-                    <ClientCard cliente={data}/>
-                </DisclosurePanel>
-            </Disclosure>
-        }
-
-        <Disclosure as="div" className="" defaultOpen>
-            <DisclosureButton
-                className="group flex w-full items-center justify-between"
-            >
-                <span className="py-2 text-left w-full font-medium text-azul">Servicios Prestados</span>
-                <ChevronDownIcon className="size-5 fill-azul/60 group-data-hover:fill-azul/50 group-data-open:rotate-180" />
-            </DisclosureButton>
-            <DisclosurePanel className="px-4 pt-4 pb-2 text-sm text-gray-700">
-                <p>lista de manifiestos</p>
-                
-            </DisclosurePanel>
-        </Disclosure>
-
-
+            {/* Card de servicios prestados */}
+            <div className="bg-blue-50 p-5 rounded-lg shadow-sm border border-gray-200">
+                <h2 className="text-azul font-medium text-base mb-4">Servicios Prestados</h2>
+                <p className="text-gray-600 text-sm">Lista de manifiestos</p>
+            </div>
         </div>
     )
 }
