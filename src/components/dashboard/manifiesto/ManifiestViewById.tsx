@@ -3,22 +3,19 @@ import { getManifestById } from "@/src/api/manifestApi"
 import Divider from "@/src/UI/Divider"
 import GoBackButton from "@/src/UI/GoBackButton"
 import LoaderPage from "@/src/UI/loaders/LoaderPage"
-import { formatDateTimeLarge, formatNumber, traslateMedidas, traslateRoles } from "@/src/utils"
+import { formatDateTimeLarge, formatNumber, traslateMedidas } from "@/src/utils"
 import { Disclosure, DisclosureButton, DisclosurePanel } from "@headlessui/react"
 import { ChevronDownIcon } from '@heroicons/react/20/solid'
 import { useQuery } from "@tanstack/react-query"
 import Image from "next/image"
 import { notFound } from "next/navigation"
 import ClientCard from "./ClientCard"
-import { useAuth } from "@/src/hooks/useAuth"
 
 type ManifiestViewByIdProps = {
     id: string
 }
 
 function ManifiestViewById( { id } : ManifiestViewByIdProps) {
-
-    const { user } = useAuth()
 
     const { data, isLoading} = useQuery({
         queryKey: ['manifiest', id],

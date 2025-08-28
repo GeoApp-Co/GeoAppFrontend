@@ -1,4 +1,3 @@
-import { useAuth } from "@/src/hooks/useAuth";
 import { ItemType } from "@/src/types";
 import { traslateMedidas } from "@/src/utils";
 import { useRouter } from "next/navigation";
