@@ -1,4 +1,5 @@
 "use client"
+import { useAuth } from "@/src/hooks/useAuth";
 import { ManifestType } from "@/src/types";
 import { formatDateTimeLarge, formatNumber } from "@/src/utils";
 import { useRouter } from "next/navigation";
@@ -10,6 +11,7 @@ type ManifestTableProps = {
 
 function ManifestTable({ manifests }: ManifestTableProps) {
     const router = useRouter();
+    const { user } = useAuth()
 
     return (
         <div className="w-full overflow-x-auto rounded-md shadow py-5">
@@ -65,12 +67,14 @@ function ManifestTable({ manifests }: ManifestTableProps) {
                     Ver
                     </button>
                     
-                    <button
-                        onClick={() => router.push(`/dashboard/manifiesto/${manifest.id}/edit`)}
-                        className="px-3 py-1 text-sm bg-verde text-white rounded hover:bg-yellow-600"
-                    >
-                        Editar
-                    </button>
+                    {user?.rol.name === 'operacion' &&
+                        <button
+                            onClick={() => router.push(`/dashboard/manifiesto/${manifest.id}/edit`)}
+                            className="px-3 py-1 text-sm bg-verde text-white rounded hover:bg-yellow-600"
+                        >
+                            Editar
+                        </button>
+                    }
                     
                 </td>
                 </tr>
