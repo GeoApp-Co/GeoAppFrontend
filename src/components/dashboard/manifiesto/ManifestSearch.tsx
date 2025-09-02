@@ -7,18 +7,18 @@ import ManifestSearchForm from './ManifestSearchForm'
 import ManifestTable from './ManifestTable'
 import GoBackButton from '@/src/UI/GoBackButton'
 
-export default function ManifestSearch({ page, search, estado, fecha }: { page: number, search: string,estado: string, fecha: string}) {
+export default function ManifestSearch({ page, clientId, estado, fecha, manifestTemplate }: { page: number, clientId: string,estado: string, fecha: string, manifestTemplate: string}) {
     const limit = 10
 
     const { data, isLoading} = useQuery({
-        queryKey: ['manifests', page, limit, search, estado, fecha],
-        queryFn: () => getManifest({ page, limit, search, estado, fecha}),
+        queryKey: ['manifests', page, limit, clientId, manifestTemplate, estado, fecha],
+        queryFn: () => getManifest({ page, limit, clientId, manifestTemplate, estado, fecha}),
     })
 
 
     return (
         <>
-            <Heading>Resultados de búsqueda: {search}</Heading>
+            <Heading>Resultados de búsqueda</Heading>
 
             <div className="grid grid-cols-1 gap-3 ">
                 <GoBackButton/>

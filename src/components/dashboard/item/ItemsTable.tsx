@@ -16,6 +16,7 @@ function ItemsTable({ items }: ItemsTableProps) {
                     <tr>
                         <th className="p-2 text-left font-semibold w-[80px]">Código</th>
                         <th className="p-2 text-left font-semibold min-w-[180px]">Nombre</th>
+                        <th className="p-2 text-left font-semibold min-w-[180px]">Categoria</th>
                         <th className="p-2 text-left font-semibold min-w-[100px]">Medida</th>
                         <th className="p-2 font-semibold w-[100px] text-right">Acciones</th>
                     </tr>
@@ -28,6 +29,7 @@ function ItemsTable({ items }: ItemsTableProps) {
                         >
                             <td className="p-2 text-xs">{item.code}</td>
                             <td className="p-2 truncate">{item.name}</td>
+                            <td className="p-2 truncate">{item.categoria}</td>
                             <td className="p-2">{traslateMedidas(item.unidad)}</td>
                             <td className="p-2 text-right">
                                 <button

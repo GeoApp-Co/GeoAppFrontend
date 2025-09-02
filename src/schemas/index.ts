@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const roles = z.enum(["admin", "superAdmin", "conductor", "comercio", "factura"])
+export const roles = z.enum(["admin", "superAdmin", "conductor", "comercio", "factura", 'operacion'])
 export const unidades = z.enum(["litro", "kg", "unidad", 'hora', 'galones', 'm3'])
 export const identificacionType = z.enum([
     "cc",              // Cédula de ciudadanía
@@ -13,6 +13,17 @@ export const identificacionType = z.enum([
     "diplomatico",     // Carné diplomático
     "sinIdentificacion"// Documento extranjero sin identificación local
 ]);
+export const itemCategoryEnum = z.enum([
+    "RESIDUOS ESPECIALES",
+    "RESIDUOS DE APROVECHAMIENTO",
+    "RESIDUOS ORDINARIOS",
+    "RESIDUOS HOSPITALARIOS",
+    "RESIDUOS PELIGROSOS SOLIDOS",
+    "RESIDUOS LIQUIDOS",
+    "SUMINISTRO",
+    "OTRO"
+]);
+
 export const personaType = z.enum(["natural", "juridica"]);
 
 const responsePaginationSchema = z.object({
@@ -56,7 +67,8 @@ export const ItemSchema = z.object({
     id: z.number(),
     code: z.string(),
     name: z.string(),
-    unidad: unidades
+    unidad: unidades,
+    categoria: itemCategoryEnum
 });
 
 export const paginatioItemsSchema = responsePaginationSchema.pick({
@@ -64,7 +76,13 @@ export const paginatioItemsSchema = responsePaginationSchema.pick({
     total: true,
     totalPages: true
 }).extend({
-    items: z.array(ItemSchema)
+    items: z.array(ItemSchema.pick({
+        code: true,
+        id: true,
+        name: true,
+        unidad: true,
+        categoria: true
+    }))
 })
 
 export const ManifestItemSchema = z.object({
@@ -75,7 +93,13 @@ export const ManifestItemSchema = z.object({
     // createdAt: z.string(),
     // updatedAt: z.string(),
     isInvoiced: z.boolean(),
-    item: ItemSchema
+    item: ItemSchema.pick({
+        code: true,
+        id: true,
+        name: true,
+        unidad: true,
+        categoria: true
+    })
 });
 
 export const ClienteSchema = z.object({
@@ -125,6 +149,7 @@ export const ManifestSchema = z.object({
     plate: z.string(),
     location: z.string().nullable(),
     date: z.string(),
+    dateFinal: z.string(),
     signature: z.string(),
     signatureClient: z.string(),
     photos: z.array(z.string()),
@@ -163,6 +188,7 @@ export const manifestSchema = ManifestSchema.pick({
     plate: true,
     location: true,
     date: true,
+    dateFinal: true,
     signature: true,
     signatureClient: true,
     photos: true,
@@ -200,8 +226,14 @@ export const manifestCommercialSchema = ManifestSchema.pick({
     manifestItems: z.array(ManifestItemSchema.pick({
         id: true,
         cantidad: true,
-        item: true,
         isInvoiced: true
+    }).extend({
+        item: ItemSchema.pick({
+            id: true,
+            code: true,
+            name: true,
+            unidad: true
+        })
     }))
 })
 
@@ -228,15 +260,27 @@ export const manifestInvoiceSchema = ManifestSchema.pick({
     manifestItems: z.array(ManifestItemSchema.pick({
         id: true,
         cantidad: true,
-        item: true,
         isInvoiced: true
+    }).extend({
+        item: ItemSchema.pick({
+            id: true,
+            code: true,
+            name: true,
+            unidad: true
+        })
     }))
 })
 
 export const templateSchema = z.object({
     id: z.number(),
     name: z.string(),
-    items: z.array(ItemSchema)
+    items: z.array(ItemSchema.pick({
+        code: true,
+        id: true,
+        name: true,
+        unidad: true,
+        categoria: true
+    }))
 })
 
 export const templatesSchema =  z.object({

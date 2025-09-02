@@ -1,9 +1,9 @@
 import ItemSearch from "@/src/components/dashboard/item/searchItem/ItemSearch"
 import { redirect } from "next/navigation"
 
-async function SearchPage({searchParams}: { searchParams: Promise<{ search: string, page: string}> }) {
+async function SearchPage({searchParams}: { searchParams: Promise<{ search: string, page: string, categoria: string}> }) {
 
-    const { search} = await searchParams
+    const { search, categoria} = await searchParams
     const params = await searchParams
     const page = +params.page || 1
     
@@ -12,6 +12,7 @@ async function SearchPage({searchParams}: { searchParams: Promise<{ search: stri
     return <ItemSearch
             page={page} 
             search={search} 
+            categoria={categoria}
         />
     }
     

@@ -1,5 +1,6 @@
 "use client"
-import { SearchForm } from "@/src/types";
+import { itemCategoryEnum } from "@/src/schemas";
+import { SearchItemForm } from "@/src/types";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
@@ -8,8 +9,11 @@ function ItemSearchForm() {
     
     const router = useRouter()
 
-    const initialValues : SearchForm = {
+    const categoryValues = itemCategoryEnum.options; 
+
+    const initialValues : SearchItemForm = {
         search: '',
+        categoria: undefined
     }
 
     const {
@@ -19,33 +23,29 @@ function ItemSearchForm() {
         defaultValues: initialValues,
     });
 
-    const handleItemSearchForm = (formData: SearchForm) => {
+    const handleItemSearchForm = (formData: SearchItemForm) => {
+        const { search, categoria } = formData;
 
-        const { search} = formData;
-
-        // Validar si todos los campos están vacíos
-        const sinSearch = !search?.trim();
-
+        const sinSearch = !search?.trim() && !categoria;
 
         if (sinSearch) {
-            toast.error("Debe ingresar un valor para la búsqueda");
-            return;
+        toast.error("Debe ingresar un valor para la búsqueda");
+        return;
         }
 
-        // Construir query dinámicamente
         const queryParams = new URLSearchParams();
 
-        if (!sinSearch) queryParams.append("search", search.trim());
+        if (search?.trim()) queryParams.append("search", search.trim());
+        if (categoria) queryParams.append("categoria", categoria);
 
-
-        const queryString = queryParams.toString();
-        router.push(`/dashboard/item/search?${queryString}`);
+        router.push(`/dashboard/item/search?${queryParams.toString()}`);
     };
+    
     return (
         
         <form
             onSubmit={handleSubmit(handleItemSearchForm)}
-            className=" flex gap-3"
+            className=" flex gap-3 md:col-span-2"
         >
 
             <input
@@ -54,6 +54,16 @@ function ItemSearchForm() {
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all bg-white"
                 {...register('search')}
             />
+
+            <select
+                {...register('categoria')}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
+            >
+                <option value="">Todas las categorías</option>
+                {categoryValues.map((cat) => (
+                    <option key={cat} value={cat}>{cat}</option>
+                ))}
+            </select>
 
             <input 
                 type="submit" 

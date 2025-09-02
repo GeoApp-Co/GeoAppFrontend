@@ -120,6 +120,8 @@ export const traslateRoles = (rolName: string): string => {
                 return 'Comercio';
             case 'factura':
                 return 'Facturación';
+            case 'operacion':
+                return 'Operaciones';
             default:
                 return `Rol desconocido (${role})`;
         }
@@ -143,7 +145,7 @@ export const transformAndValidateQuantity = (value: string): number | null => {
     if (isNaN(parsedValue) || parsedValue < 0) {
         return null; // Retorna null si no es un número válido o es negativo
     }
-
+    
     return parsedValue;
 };
 

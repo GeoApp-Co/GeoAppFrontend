@@ -5,6 +5,7 @@ import { NewItemFormType } from "../types"
 
 type ItemType = {
     search?: string,
+    categoria?: string,
     limit?: number, 
     page?: number,
     formData: NewItemFormType
@@ -12,7 +13,7 @@ type ItemType = {
     manifestItemId: number
 }
 
-export async function getItems( { limit, page, search } : Pick<ItemType, 'limit' | 'page' | 'search'>) {
+export async function getItems( { limit, page, search, categoria } : Pick<ItemType, 'limit' | 'page' | 'search'| 'categoria' >) {
         try {
         const url = '/items'
         const {data} = await api.get(url, {
@@ -20,6 +21,7 @@ export async function getItems( { limit, page, search } : Pick<ItemType, 'limit'
                 search,
                 limit,
                 page,
+                categoria
             }
         })
 

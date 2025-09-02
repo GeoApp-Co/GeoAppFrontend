@@ -13,7 +13,7 @@ export default function DashboardManifest({ page }: { page: number }) {
 
     const { data, isLoading  } = useQuery({
         queryKey: ['manifests', page, limit],
-        queryFn: () => getManifest({ page, limit, }),
+        queryFn: () => getManifest({ page, limit, clientId: '' }),
     })
 
     return (

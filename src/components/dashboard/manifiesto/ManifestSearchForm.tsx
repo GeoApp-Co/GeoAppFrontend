@@ -47,7 +47,7 @@ function ManifestSearchForm() {
         const sinFecha = !fechaFormateada;
         const sinTemplate = !manifestTemplate;
 
-        if (sinClientId && sinEstado && sinFecha) {
+        if (sinClientId && sinEstado && sinFecha && sinTemplate) {
             toast.error("Debe ingresar al menos un filtro de búsqueda");
             return;
         }

@@ -22,12 +22,16 @@ function NewManifestPage() {
     const router = useRouter()
     const { user } = useAuth()
 
+    const now = new Date();
+    const oneHourLater = new Date(now.getTime() + 60 * 60 * 1000);
+
     const methods = useForm<NewManifestFormType>({
         defaultValues: {
             clientId: 0,
             manifestTemplateId: 0,
             plate: '',
-            date: new Date(),
+            date: now,
+            dateFinal: oneHourLater,
             observations: '',
             items: [],
             photos: [],
@@ -62,7 +66,6 @@ function NewManifestPage() {
     
     const onSubmit = methods.handleSubmit((formData) => {
 
-        
         const errors: string[] = []
 
         // Validar que no estén vacíos o en valores inválidos
@@ -100,6 +103,10 @@ function NewManifestPage() {
             errors.push("Debes ingresar al menos un ítem con cantidad.")
         }
 
+        if (formData.dateFinal <= formData.date) {
+        errors.push("La fecha final debe ser posterior a la fecha inicial.");
+        }
+
         // Si hay errores, retornar todos
         if (errors.length > 0) {
             errors.forEach((err) => toast.error(err))
@@ -123,6 +130,7 @@ function NewManifestPage() {
             <ClientComboBox />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+
                 {/* Campo: Placa */}
                 <div>
                 <label className="text-azul font-bold block text-sm mb-1">Placa del vehículo</label>
@@ -134,30 +142,7 @@ function NewManifestPage() {
                 />
                 </div>
 
-                {/* Campo: Fecha con DatePicker */}
-                <div>
-                <label className="text-azul font-bold block text-sm mb-1">Fecha</label>
-                <Controller
-                    control={control}
-                    name="date"
-                    render={({ field }) => {
-                        const { value, onChange } = field;
-                        return (
-                        <DatePicker
-                            selected={value}
-                            onChange={onChange}
-                            dateFormat="MM/yyyy"
-                            showMonthYearPicker
-                            placeholderText="Seleccionar Mes"
-                            wrapperClassName="w-full"
-                            readOnly
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all bg-white"
-                        />
-                        );
-                    }}
-                />
-                </div>
-
+                {/* Campo: Ubicacón */}
                 <div>
                 <label className="text-azul font-bold block text-sm mb-1">Lugar</label>
                 <input
@@ -165,6 +150,53 @@ function NewManifestPage() {
                     {...register("location")}
                     className="w-full bg-white px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
                     placeholder="Lugar del servicio"
+                />
+                </div>
+
+                {/* Campo: Fecha con DatePicker */}
+                <div>
+                <label className="text-azul font-bold block text-sm mb-1">Fecha Inicial</label>
+                <Controller
+                    control={control}
+                    name="date"
+                    render={({ field }) => {
+                        const { value, onChange } = field;
+                        return (
+                            <DatePicker
+                                selected={value}
+                                onChange={onChange}
+                                showTimeSelect
+                                dateFormat="dd/MM/yyyy HH:mm"
+                                placeholderText="Seleccionar fecha y hora"
+                                wrapperClassName="w-full"
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all bg-white"
+                            />
+                        );
+                    }}
+                />
+                </div>
+
+                {/* Campo: Fecha final con DatePicker */}
+                <div className="w-full">
+                <label className="text-azul font-bold block text-sm mb-1">Fecha Final</label>
+                <Controller
+                    control={control}
+                    name="dateFinal"
+                    render={({ field }) => {
+                        const { value, onChange } = field;
+                        return (
+                            <DatePicker
+                                selected={value}
+                                onChange={onChange}
+                                showTimeSelect
+                                dateFormat="dd/MM/yyyy HH:mm"
+                                placeholderText="Seleccionar fecha y hora"
+                                wrapperClassName="w-full"
+
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all bg-white"
+                            />
+                        );
+                    }}
                 />
                 </div>
 

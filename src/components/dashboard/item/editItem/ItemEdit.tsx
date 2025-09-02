@@ -28,7 +28,8 @@ function ItemEdit( { id } : ItemEditProps) {
     const initialValues : NewItemFormType = {
         code: '',
         name: '',
-        unidad: 'kg'
+        unidad: 'kg',
+        categoria: 'OTRO'
     }
 
     const { register, handleSubmit, formState: {errors}, reset} = useForm({
@@ -56,7 +57,8 @@ function ItemEdit( { id } : ItemEditProps) {
             reset({
                 code: data.code || '',
                 name: data.name || '',
-                unidad: data.unidad || 'kg'
+                unidad: data.unidad || 'kg',
+                categoria: data.categoria || 'OTRO'
             })
         }
     }, [data, reset])

@@ -1,18 +1,19 @@
 import ManifestSearch from "@/src/components/dashboard/manifiesto/ManifestSearch"
 import { redirect } from "next/navigation"
 
-async function SearchPage({searchParams}: { searchParams: Promise<{ search: string, page: string, estado: string, fecha: string}> }) {
+async function SearchPage({searchParams}: { searchParams: Promise<{ clientId: string, manifestTemplate: string,  page: string, estado: string, fecha: string}> }) {
 
-    const { search, estado, fecha } = await searchParams
+    const { clientId, manifestTemplate, estado, fecha } = await searchParams
     const params = await searchParams
     const page = +params.page || 1
     
-    if (page < 1) redirect(`/dashboard/manifiesto/search?search=${search}&page=1`)
+    if (page < 1) redirect(`/dashboard/manifiesto/search?search=${clientId}&page=1`)
 
     return <ManifestSearch 
         page={page} 
-        search={search} 
+        clientId={clientId} 
         estado={estado}
+        manifestTemplate={manifestTemplate}
         fecha={fecha}
         />
     }

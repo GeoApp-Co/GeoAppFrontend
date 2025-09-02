@@ -1,6 +1,6 @@
 "use client";
 
-import { ManifestCommerceType, ManifestInvoiceType, PaginationManifestCommercialType } from "@/src/types";
+import { ManifestInvoiceType, PaginationManifestCommercialType } from "@/src/types";
 import { formatDateTimeLarge, formatNumber, traslateMedidas } from "@/src/utils";
 import CloseIcon from '@mui/icons-material/Close';
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
@@ -24,10 +24,10 @@ import {
 } from "@mui/material";
 import { QueryObserverResult, RefetchOptions } from "@tanstack/react-query";
 import * as React from "react";
-import { selectedManifestInvoice } from "./DashboardBillingManifesto";
 import { selectedItem } from "../manifiesto-comercial/DashboardCommercialManifesto";
-import ManifestInputInvoiceUpdate from "./ManifestInputInvoiceUpdate";
+import { selectedManifestInvoice } from "./DashboardBillingManifesto";
 import EditLockButton from "./EditLockButton";
+import ManifestInputInvoiceUpdate from "./ManifestInputInvoiceUpdate";
 
 
 type ManifestInvoiceTableProps = {
@@ -143,7 +143,7 @@ function Row({
                     </Stack>
                 )}
             </TableCell>
-            <TableCell>{row.quotationCode}</TableCell>
+            <TableCell>{row.quotationCode || '---'}</TableCell>
             <TableCell>
                 <ManifestInputInvoiceUpdate
                     invoiceCode={
@@ -264,9 +264,9 @@ function ManifestInvoiceTable({ manifests, refetch, totalCantidad, totalItems, o
                 <TableCell sx={headerStyle}>Fecha</TableCell>
                 <TableCell sx={headerStyle}>Ubicación</TableCell>
                 <TableCell sx={headerStyle}>Facturado</TableCell>
-                <TableCell sx={headerStyle}>#-Cotización</TableCell>
-                <TableCell sx={headerStyle}>#-Facturación</TableCell>
-                <TableCell sx={headerStyle}>¿Es Editable?</TableCell>
+                <TableCell sx={headerStyle}>#-Cot</TableCell>
+                <TableCell sx={headerStyle}>#-Fact</TableCell>
+                <TableCell sx={headerStyle}>Facturar</TableCell>
                 </TableRow>
             </TableHead>
                 <TableBody>

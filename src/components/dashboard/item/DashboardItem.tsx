@@ -43,7 +43,7 @@ function DashboadItem( { page } :  DashboadItemProps) {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <button
                     onClick={handleNewCliente}
-                    className={`bg-verde w-full lg:w-auto text-xl px-4 py-2 text-center font-bold text-white rounded-xl border-verde transition-colors `}
+                    className={`bg-verde w-full lg:w-auto text-xl px-4 py-2 text-center font-bold text-white rounded-xl border-verde transition-colors md:col-span-2 `}
                 >
                     Formulario de Nuevo Item
                 </button>

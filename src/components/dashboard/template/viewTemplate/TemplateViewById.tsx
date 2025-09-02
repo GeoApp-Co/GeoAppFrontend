@@ -27,24 +27,24 @@ function TemplateViewById({ id }: TemplateViewByIdProps) {
         return (
     <div className="max-w-4xl mx-auto mt-10 p-3 bg-white shadow-lg rounded-md space-y-1">
         <div className="flex flex-col gap-3 lg:flex-row md:justify-between items-center mb-2">
-                    <h2 className="text-2xl font-bold text-azul">
-                        Plantilla de Manifiesto:{" "}
-                        <span className="font-semibold text-gray-800">#{formatNumber(data?.id)}</span>
-                    </h2>
-                    <GoBackButton />
+            <h2 className="text-2xl font-bold text-azul">
+                Plantilla de Manifiesto:{" "}
+                <span className="font-semibold text-gray-800">#{formatNumber(data?.id)}</span>
+            </h2>
+            <GoBackButton />
         </div>
 
-                <Divider />
+        <Divider />
 
-                <div className="p-4 border border-gray-200 rounded-md">
-                    <h3 className="text-lg font-semibold text-gray-800 mb-2">Nombre de la Plantilla</h3>
-                    <p className="text-gray-700">{data.name}</p>
-                </div>
+        <div className="p-4 border border-gray-200 rounded-md">
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">Nombre de la Plantilla</h3>
+            <p className="text-gray-700">{data.name}</p>
+        </div>
 
 
-                <div className="p-4 border border-gray-200 rounded-md">
-                    <h3 className="text-lg font-semibold text-gray-800 mb-2">Items de la Plantilla</h3>
-                    <TemplateItemsTable items={data.items} />
+        <div className="p-4 border border-gray-200 rounded-md">
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">Items de la Plantilla</h3>
+            <TemplateItemsTable items={data.items} />
         </div>
 
         </div>

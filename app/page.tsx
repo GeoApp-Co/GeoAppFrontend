@@ -9,13 +9,13 @@ const navigation = [
     url: "/dashboard/diligenciar",
     text: "Diligenciar Manifiesto",
     descripcion: "Llena y gestiona formularios de manifiestos",
-    role: ["admin", "conductor", "superAdmin"],
+    role: ["admin", "conductor", "superAdmin", 'operacion'],
   },
   {
     url: "/dashboard/manifiesto",
     text: "Lista de Servicios",
     descripcion: "Administra los manifiestos / servicios creados",
-    role: ["admin", "conductor", 'superAdmin', 'comercio', 'factura'],
+    role: ["admin", "conductor", 'superAdmin', 'comercio', 'factura', 'operacion'],
   },
   {
     url: "/dashboard/manifiesto-comercial",

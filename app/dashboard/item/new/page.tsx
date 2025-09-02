@@ -17,7 +17,8 @@ function NewItemPage() {
     const initialValues : NewItemFormType = {
         code: '',
         name: '',
-        unidad: 'kg'
+        unidad: 'kg',
+        categoria: 'OTRO'
     }
 
     const { register, handleSubmit, formState: {errors}} = useForm({
@@ -34,7 +35,7 @@ function NewItemPage() {
             queryClient.invalidateQueries({queryKey: ['items']})
 
             setTimeout(() => {
-                router.push(`/dashboard/item`)
+                router.push(`/dashboard/item/${data}/edit`)
             }, 3000) // Espera 3 segundos
         }
     })

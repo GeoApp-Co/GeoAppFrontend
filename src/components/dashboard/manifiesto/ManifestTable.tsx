@@ -1,9 +1,8 @@
-import { useAuth } from "@/src/hooks/useAuth";
+"use client"
 import { ManifestType } from "@/src/types";
 import { formatDateTimeLarge, formatNumber } from "@/src/utils";
 import { useRouter } from "next/navigation";
-import { FaCheck } from "react-icons/fa";
-import { FaTimes } from "react-icons/fa";
+import { FaCheck, FaTimes } from "react-icons/fa";
 
 type ManifestTableProps = {
     manifests: ManifestType[];
@@ -11,7 +10,6 @@ type ManifestTableProps = {
 
 function ManifestTable({ manifests }: ManifestTableProps) {
     const router = useRouter();
-    const { user } = useAuth();
 
     return (
         <div className="w-full overflow-x-auto rounded-md shadow py-5">
@@ -66,14 +64,14 @@ function ManifestTable({ manifests }: ManifestTableProps) {
                     >
                     Ver
                     </button>
-                    {user?.rol.name === "admin" && (
+                    
                     <button
-                        onClick={() => router.push(`/manifests/${manifest.id}/edit`)}
+                        onClick={() => router.push(`/dashboard/manifiesto/${manifest.id}/edit`)}
                         className="px-3 py-1 text-sm bg-verde text-white rounded hover:bg-yellow-600"
                     >
                         Editar
                     </button>
-                    )}
+                    
                 </td>
                 </tr>
             ))}

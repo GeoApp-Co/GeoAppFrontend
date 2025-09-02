@@ -1,36 +1,38 @@
 import { isAxiosError } from "axios";
 import api from "../config/axios";
 import { manifestSchema, paginationManifestCommercialSchema, paginationManifestInvoicelSchema, paginationManifestSchema } from "../schemas";
-import { InvoiceCodeFormType, ManifestInvoiceSearchFormData, NewManifestFormType, QuotationCodeFormType } from "../types";
+import { InvoiceCodeFormType, ManifestInvoiceSearchFormData, NewManifestFormType, QuotationCodeFormType, UpdateManifestFormType } from "../types";
 
 
 type ManifestType = {
     page: number, 
     limit: number, 
-    search?: string,
+    clientId?: string,
+    manifestTemplate?: string,
     estado?: string,
     fecha?: string,
     manifestId: string
     formData: NewManifestFormType
+    updateManifestformData: UpdateManifestFormType
     InvoiceCodeFormData: InvoiceCodeFormType
     quotationCodeFormType: QuotationCodeFormType
 } & ManifestInvoiceSearchFormData
 
-export async function getManifest( {  limit, page, estado, search, fecha } : Pick<ManifestType, 'estado' | 'limit' | 'page' | 'search' | 'fecha'>) {
+export async function getManifest( {  limit, page, estado, clientId, fecha, manifestTemplate } : Pick<ManifestType, 'estado' | 'limit' | 'page' | 'clientId' | 'fecha' | 'manifestTemplate'>) {
     try {
         const url = '/manifests'
         const { data } = await api.get(url, {
             params: {
                 page,
                 limit,
-                search,
+                clientId,
+                manifestTemplate,
                 estado,
                 fecha
             }
         }) 
 
         const response = paginationManifestSchema.safeParse(data)
-        console.log(response);
 
         if (response.success) {
             return response.data
@@ -182,6 +184,20 @@ export async function createManifest( { formData } : Pick<ManifestType, 'formDat
     try {
         const url = '/manifests'
         const { data } = await api.post<number>(url, formData)
+
+        return data
+    } catch (error) {
+        if (isAxiosError(error) && error.response) {
+            console.log(error);
+            throw new Error(error.response.data.error);
+        }
+    }
+}
+
+export async function updateManifest( { manifestId, updateManifestformData } : Pick<ManifestType, 'updateManifestformData' | 'manifestId'>) {
+    try {
+        const url = `/manifests/${manifestId}`
+        const { data } = await api.put<string>(url, updateManifestformData)
 
         return data
     } catch (error) {

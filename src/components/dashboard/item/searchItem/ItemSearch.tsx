@@ -7,13 +7,14 @@ import ItemsPagination from '../ItemsPagination'
 import ItemsTable from '../ItemsTable'
 import ItemSearchForm from './ClienteSearchForm'
 
-export default function ItemSearch({ page, search }: { page: number, search: string}) {
+export default function ItemSearch({ page, search, categoria }: { page: number, search: string, categoria: string}) {
     const limit = 10
 
-    const { data, isLoading} = useQuery({
-        queryKey: ['items', page, limit, search],
-        queryFn: () => getItems({ page, limit, search}),
-    })
+    const { data, isLoading } = useQuery({
+        queryKey: ['items', page, limit, search, categoria],
+        queryFn: () => getItems({ page, limit, search, categoria }),
+        enabled: !!page || !!search?.trim() || !!categoria?.trim()
+    });
 
 
     return (

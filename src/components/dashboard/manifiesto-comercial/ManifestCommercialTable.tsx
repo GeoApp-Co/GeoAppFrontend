@@ -247,7 +247,7 @@ function ManifestCommercialTable({ selected, onToggleItem, onToggleManifest, onQ
                 <TableCell sx={headerStyle}>Fecha</TableCell>
                 <TableCell sx={headerStyle}>Ubicación</TableCell>
                 <TableCell sx={headerStyle}>Facturado</TableCell>
-                <TableCell sx={headerStyle}>#-Cotización</TableCell>
+                <TableCell sx={headerStyle}>#-Cot</TableCell>
                 </TableRow>
             </TableHead>
                 <TableBody>
