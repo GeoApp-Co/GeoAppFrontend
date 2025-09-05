@@ -24,7 +24,6 @@ export async function getSelectClient( { search, limit, page  } : Pick<ClientTyp
         })
 
         const response = paginationClientesSchema.safeParse(data)
-        console.log(response);
         
 
         if (response.success) {

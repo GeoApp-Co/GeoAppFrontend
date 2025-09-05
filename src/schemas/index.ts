@@ -16,15 +16,17 @@ export const identificacionType = z.enum([
 export const itemCategoryEnum = z.enum([
     "RESIDUOS ESPECIALES",
     "RESIDUOS DE APROVECHAMIENTO",
-    "RESIDUOS ORDINARIOS",
+    "RESIDUOS NO APROVECHABLES",
     "RESIDUOS HOSPITALARIOS",
     "RESIDUOS PELIGROSOS SOLIDOS",
     "RESIDUOS LIQUIDOS",
     "SUMINISTRO",
     "OTRO"
 ]);
-
 export const personaType = z.enum(["natural", "juridica"]);
+export const certificateType = z.enum([
+    "CERTIFICADO DE GESTIÓN INTEGRAL DE RESIDUOS"
+]);
 
 const responsePaginationSchema = z.object({
     total: z.number(),
@@ -271,6 +273,40 @@ export const manifestInvoiceSchema = ManifestSchema.pick({
     }))
 })
 
+export const manifestCertificateSchema = ManifestSchema.pick({
+    id: true,
+    date: true,
+    isInvoiced: true,
+    location: true,
+    invoiceCode: true,
+}).extend({
+    cliente: ClienteSchema.pick({
+        id: true,
+        name: true,
+        identificacion: true,
+        identificacionType: true,
+        alias: true
+    }),
+    manifestTemplate: ManifestTemplateSchema.pick({
+        id: true,
+        name: true
+    }),
+    manifestItems: z.array(ManifestItemSchema.pick({
+        id: true,
+        cantidad: true,
+    }).extend({
+        item: ItemSchema.pick({
+            id: true,
+            code: true,
+            name: true,
+            unidad: true,
+            categoria: true
+        })
+    }))
+})
+
+
+
 export const templateSchema = z.object({
     id: z.number(),
     name: z.string(),
@@ -333,4 +369,45 @@ export const paginationManifestInvoicelSchema = responsePaginationSchema.pick({
     totalPages: true,
 }).extend({
     manifests: z.array(manifestInvoiceSchema)
+})
+
+export const paginationManifestCertificateSchema = responsePaginationSchema.pick({
+    currentPage: true,
+    total: true,
+    totalPages: true,
+}).extend({
+    manifests: z.array(manifestCertificateSchema)
+})
+
+export const CertificateSchema = z.object({
+    id: z.number(),
+    No: z.string(),
+    certificateType: certificateType,
+    createdAt: z.string()
+})
+
+
+export const certificateSchema = CertificateSchema.pick({
+    certificateType: true,
+    createdAt: true,
+    id: true,
+    No: true,
+
+}).extend({
+    cliente: ClienteSchema.pick({
+        id: true,
+        name: true,
+        alias: true,
+        identificacion: true,
+        identificacionType: true,
+    })
+})
+
+export const paginationCertificatesSchema = responsePaginationSchema.pick({
+    currentPage: true,
+    total: true,
+    totalPages: true,
+}).extend({
+    certificates: z.array(
+certificateSchema)
 })

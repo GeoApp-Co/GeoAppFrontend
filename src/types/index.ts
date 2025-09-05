@@ -1,5 +1,5 @@
 import z from "zod"
-import {  ClienteSchema, itemCategoryEnum, ItemSchema, manifesPreviewtSchema, manifestCommercialSchema, manifestInvoiceSchema, ManifestItemSchema, paginationManifestCommercialSchema, roles, templateSchema, unidades, userSchema } from "../schemas"
+import {  certificateSchema, certificateType, ClienteSchema, itemCategoryEnum, ItemSchema, manifesPreviewtSchema, manifestCertificateSchema, manifestCommercialSchema, manifestInvoiceSchema, ManifestItemSchema, paginationManifestCommercialSchema, roles, templateSchema, unidades, userSchema } from "../schemas"
 
 export type User = {
     name: string
@@ -7,6 +7,8 @@ export type User = {
 }
 
 export type ItemCategoryType = z.infer<typeof itemCategoryEnum>
+
+export type CertificateType = z.infer<typeof certificateType>
 
 export type GroupedItems = {
     [key in ItemCategoryType]?: Pick<ManifestItemType, 'id' | 'cantidad' | 'item' >[];
@@ -30,6 +32,10 @@ export type SearchManifestForm = {
 }
 export type SearchForm = {
     search: string
+}
+
+export type CertificateSearchFormType = {
+    code: string
 }
 
 export type SearchItemForm = {
@@ -58,7 +64,6 @@ export type ItemCantidad = {
     cantidad: number
 }
 
-
 export type NewManifestFormType = {
     clientId: number
     manifestTemplateId: number
@@ -73,6 +78,13 @@ export type NewManifestFormType = {
     location: string
     contactClient: string;
     positionClient: string;
+}
+
+export type NewCertificateType = {
+    manifestIds: number[]
+    No: string
+    clientId: string
+    certificateType: CertificateType
 }
 
 export type UpdateManifestFormType = {
@@ -108,10 +120,12 @@ export type ManifestType = z.infer<typeof manifesPreviewtSchema>
 export type ManifestItemType = z.infer<typeof ManifestItemSchema>
 export type ManifestCommerceType = z.infer<typeof manifestCommercialSchema>
 export type ManifestInvoiceType = z.infer<typeof manifestInvoiceSchema>
+export type ManifestCertificateType = z.infer<typeof manifestCertificateSchema>
 export type ItemType = z.infer<typeof ItemSchema>
 export type TemplateType = z.infer<typeof templateSchema>
 export type UserType = z.infer<typeof userSchema>
 
+export type CertificateClientType  = z.infer<typeof certificateSchema>
 
 // export type SelectedItemType = {
 //     itemId: number;

@@ -1,16 +1,17 @@
 import { isAxiosError } from "axios";
 import api from "../config/axios";
-import { manifestSchema, paginationManifestCommercialSchema, paginationManifestInvoicelSchema, paginationManifestSchema } from "../schemas";
+import { manifestSchema, paginationManifestCertificateSchema, paginationManifestCommercialSchema, paginationManifestInvoicelSchema, paginationManifestSchema } from "../schemas";
 import { InvoiceCodeFormType, ManifestInvoiceSearchFormData, NewManifestFormType, QuotationCodeFormType, UpdateManifestFormType } from "../types";
 
 
 type ManifestType = {
-    page: number, 
-    limit: number, 
-    clientId?: string,
+    page: number
+    limit: number
+    clientId?: string
     manifestTemplate?: string,
-    estado?: string,
-    fecha?: string,
+    estado?: string
+    fecha?: string
+    code: string
     manifestId: string
     formData: NewManifestFormType
     updateManifestformData: UpdateManifestFormType
@@ -78,6 +79,7 @@ export async function getInvoiceManifest({  limit, page, clientId, fechaMes, ite
         }
     }
 }
+
 export async function getCommercialManifest({  limit, page, clientId, fechaMes, item, location, manifestTemplate, manifestId, quotationCode, isInvoiced } : Pick<ManifestType, 'limit' | 'page' | 'clientId' | 'fechaMes' | 'item' | 'manifestTemplate' | 'location' | 'manifestId' | 'quotationCode' | 'isInvoiced' >) {
     try {
         const url = '/manifests/commercial'
@@ -97,7 +99,6 @@ export async function getCommercialManifest({  limit, page, clientId, fechaMes, 
         })
         
         const response = paginationManifestCommercialSchema.safeParse(data)
-        console.log(response.error);
         
         if (response.success) {
             return response.data
@@ -111,6 +112,33 @@ export async function getCommercialManifest({  limit, page, clientId, fechaMes, 
     }
 }
 
+export async function getCertificateManifest({  limit, page, code, clientId} : Pick<ManifestType, 'limit' | 'page' | 'code' | 'clientId'>) {
+    try {
+        const url = '/manifests/certificate'
+        const { data } = await api.get(url, {
+            params: {
+                page,
+                limit,
+                code,
+                clientId: +clientId
+            }
+        })
+        
+        const response = paginationManifestCertificateSchema.safeParse(data)
+        
+        if (response.success) {
+            console.log(response.data);
+            return response.data
+            
+        }
+
+    } catch (error) {
+        if (isAxiosError(error) && error.response) {
+            console.log(error);
+            throw new Error(error.response.data.error);
+        }
+    }
+}
 // export async function updateManifestItemPrice( { manifestId, manifestItemPriceFormData } : Pick<ManifestType, 'manifestId' | 'manifestItemPriceFormData'>) {
 //     try {
 //         const url = `/manifests/${manifestId}/manifest-item-price`

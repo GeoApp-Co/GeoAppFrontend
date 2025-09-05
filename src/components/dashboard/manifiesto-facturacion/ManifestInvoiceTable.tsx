@@ -6,7 +6,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 
-import { CheckCircleIcon } from "@heroicons/react/20/solid";
+import CheckIcon from '@mui/icons-material/Check';
 import {
     Box,
     Checkbox,
@@ -128,7 +128,7 @@ function Row({
                 {row.isInvoiced ? (
 
                     <Stack direction="row" alignItems="center" spacing={1}>
-                        <CheckCircleIcon color="success" fontSize="small" />
+                        <CheckIcon color="success" fontSize="small" />
                         <Typography variant="body2" color="success.main">
                         Facturado
                         </Typography>

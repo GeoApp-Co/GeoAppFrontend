@@ -16,3 +16,6 @@ async function DashboardPage({searchParams} : {searchParams: Promise<{ page: str
 }
 
 export default DashboardPage
+
+
+

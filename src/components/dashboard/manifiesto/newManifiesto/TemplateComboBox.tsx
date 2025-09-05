@@ -146,11 +146,21 @@ function TemplateComboBox( {  manifestTemplate} : TemplateComboBoxProps) {
                                 <input
                                     type="number"
                                     {...register(`cantidad-${m.id}`, {
-                                        required: true,
-                                        min: 0.0,
+                                        min: 0,
                                         valueAsNumber: true,
                                         onChange: (e) => {
-                                        const validatedQuantity = transformAndValidateQuantity(e.target.value);
+                                        const rawValue = e.target.value;
+
+                                        if (rawValue === "") {
+                                            // permitir vacío
+                                            const updatedItems = currentItems.map((item) =>
+                                            item.itemId === m.id ? { ...item, cantidad: 0 } : item
+                                            );
+                                            setValue("items", updatedItems);
+                                            return;
+                                        }
+
+                                        const validatedQuantity = transformAndValidateQuantity(rawValue);
                                         if (validatedQuantity !== null) {
                                             setValue(`cantidad-${m.id}`, validatedQuantity);
 
@@ -166,9 +176,10 @@ function TemplateComboBox( {  manifestTemplate} : TemplateComboBoxProps) {
                                     })}
                                     placeholder="0.00"
                                     step="0.01"
-                                    value={currentItems.find((i) => i.itemId === m.id)?.cantidad ?? 0}
+                                    value={currentItems.find((i) => i.itemId === m.id)?.cantidad ?? ""} 
                                     className="w-full px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-azul bg-white text-sm"
                                 />
+
                             </td>
                             </tr>
                         ))}

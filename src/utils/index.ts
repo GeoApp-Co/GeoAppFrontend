@@ -130,22 +130,18 @@ export const traslateRoles = (rolName: string): string => {
     }
 };
 
-// Función para transformar y validar la cantidad
 export const transformAndValidateQuantity = (value: string): number | null => {
-    // Elimina espacios en blanco al inicio y al final de la cadena
-    const trimmedValue = value.trim();
+    const trimmedValue = value.trim().replace(",", ".")
 
-    // Reemplaza comas por puntos y puntos por puntos (para evitar problemas si ya hay un punto)
-    const cleanedValue = trimmedValue.replace(",", ".").replace(".", ".");
+    if (trimmedValue === "") return null;
 
-    const parsedValue = parseFloat(cleanedValue);
+    // Usa Number en lugar de parseFloat para más consistencia
+    const parsedValue = Number(trimmedValue);
 
-
-    // Verifica si el valor es un número válido y mayor o igual a cero.
     if (isNaN(parsedValue) || parsedValue < 0) {
-        return null; // Retorna null si no es un número válido o es negativo
+        return null;
     }
-    
-    return parsedValue;
+
+    return parsedValue; // lo retorna tal cual, con todos sus decimales
 };
 

@@ -30,6 +30,12 @@ const navigation = [
     role: ["admin", "factura", 'superAdmin'],
   },
   {
+    url: "/dashboard/certificado",
+    text: "Certificación",
+    descripcion: "Agrupa servicios y crea los certificados",
+    role: ["admin", "factura", 'superAdmin'],
+  },
+  {
     url: "/dashboard/cliente",
     text: "Clientes",
     descripcion: "Gestiona la información de los clientes",

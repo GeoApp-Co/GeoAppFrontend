@@ -1,12 +1,11 @@
 "use client";
 
-import { ManifestCommerceType, PaginationManifestCommercialType } from "@/src/types";
+import { ManifestCertificateType } from "@/src/types";
 import { formatDateTimeLarge, formatNumber, traslateMedidas } from "@/src/utils";
+import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
-
-import CheckIcon from '@mui/icons-material/Check';
 import {
     Box,
     Checkbox,
@@ -22,22 +21,15 @@ import {
     TableRow,
     Typography
 } from "@mui/material";
-import { QueryObserverResult, RefetchOptions } from "@tanstack/react-query";
 import * as React from "react";
-import { selectedItem, selectedManifest } from "./DashboardCommercialManifesto";
-import InvoiceStatusCell from "./InvoiceStatusCell";
-import ManifestInputUpdate from "./ManifestInputUpdate";
+import { selectedManifestCertificate } from "./newCertificado/CertificateNew";
 
 
-type ManifestCommercialTableProps = {
-    manifests: ManifestCommerceType[];
-    selected: selectedManifest[]
-    onToggleManifest: (manifestId: number, items: selectedItem[]) => void
-    onToggleItem: (manifestId: number, item: selectedItem) => void
-    onQuotationCodeChange: (newQuotationCode: string) => void
-    refetch: (options?: RefetchOptions | undefined) => Promise<QueryObserverResult<PaginationManifestCommercialType | undefined, Error>>
-    totalItems: number
-    totalCantidad: number
+type ManifestCertificateTableProps = {
+    manifests: ManifestCertificateType[];
+    onToggleManifest: (manifestId: number) => void
+    onToggleManifests: (manifestIds: number[]) => void
+    selected: selectedManifestCertificate[]
 };
 
 const headerStyle = {
@@ -49,38 +41,18 @@ const headerStyle = {
 
 function Row({
     row,
-    selected,
     onToggleManifest,
-    onToggleItem,
-    onQuotationCodeChange,
-    refetch,
+    selected,
     index
 }: {
-    row: ManifestCommerceType;
-    selected: selectedManifest[]
-    onToggleManifest: (manifestId: number, items: selectedItem[]) => void
-    onToggleItem: (manifestId: number, item: selectedItem) => void
-    onQuotationCodeChange: (newQuotationCode: string) => void
-    refetch: (options?: RefetchOptions | undefined) => Promise<QueryObserverResult<PaginationManifestCommercialType | undefined, Error>>
+    row: ManifestCertificateType;
+    onToggleManifest: (manifestId: number) => void
+    selected: selectedManifestCertificate[]
     index: number
 }) {
     const [open, setOpen] = React.useState(false);
 
-    const manifestSelected = selected.find((manifest) => manifest.id === row.id);
-
-    // ✅ Padre (manifiesto)
-    const allItemsSelected = manifestSelected
-    ? row.manifestItems.every((i) =>
-        manifestSelected.items.some((sel) => sel.id === i.item.id)
-        )
-    : false;
-
-    const someItemsSelected = manifestSelected
-    ? row.manifestItems.some((i) =>
-        manifestSelected.items.some((sel) => sel.id === i.item.id)
-        ) && !allItemsSelected
-    : false;
-
+    const seletedManifest = selected.find(manifest => manifest.id == row.id)
 
     return (
         <React.Fragment>
@@ -92,20 +64,10 @@ function Row({
             }}
         >
             <TableCell padding="checkbox">
-            <Checkbox
-            checked={allItemsSelected}
-            indeterminate={someItemsSelected}
-            onChange={() =>
-                onToggleManifest(
-                row.id,
-                row.manifestItems.map((i) => ({
-                    id: i.item.id,   // 👈 usar item.id real
-                    cantidad: +i.cantidad,
-                }))
-                )
-            }
-            />
-
+                <Checkbox
+                    checked={!!seletedManifest}
+                    onChange={() => onToggleManifest(row.id)}
+                />
             </TableCell>
             <TableCell>
             <IconButton
@@ -120,7 +82,16 @@ function Row({
             {formatNumber(row.id)}
             </TableCell>
             <TableCell>{row.cliente.alias}</TableCell>
-            <TableCell>{row.manifestTemplate.name}</TableCell>
+            <TableCell
+                sx={{
+                    maxWidth: 300, // ancho máximo (ajusta a tu gusto)
+                    // whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                }}
+                >
+                {row.manifestTemplate.name}
+            </TableCell>
             <TableCell>{formatDateTimeLarge(row.date)}</TableCell>
             <TableCell>{row.location ?? "Sin ubicación"}</TableCell>
             <TableCell>
@@ -142,14 +113,7 @@ function Row({
                     </Stack>
                 )}
             </TableCell>
-            <TableCell>
-                <ManifestInputUpdate
-                    quotationCode={
-                        manifestSelected ? manifestSelected.quotationCode : row.quotationCode // usa lo que está en selected
-                    }
-                    onQuotationCodeChange={onQuotationCodeChange} 
-                    disabled={!manifestSelected}
-                />
+            <TableCell>{row.invoiceCode}
             </TableCell>
         </TableRow>
 
@@ -165,11 +129,10 @@ function Row({
                 <Table size="small" aria-label="items">
                     <TableHead>
                     <TableRow>
-                        <TableCell sx={headerStyle}>✔</TableCell>
                         <TableCell sx={headerStyle}>Código</TableCell>
                         <TableCell sx={headerStyle}>Nombre</TableCell>
+                        <TableCell sx={headerStyle}>Categoria</TableCell>
                         <TableCell sx={headerStyle}>Unidad</TableCell>
-                        <TableCell sx={headerStyle}>¿Se factura?</TableCell>
                         <TableCell align="right" sx={headerStyle}>
                         Cantidad
                         </TableCell>
@@ -183,28 +146,10 @@ function Row({
                                 backgroundColor: idx % 2 === 0 ? "#fdfdfd" : "#f5f5f5", // intercalado entre los hijos
                             }}
                         >
-                        <TableCell padding="checkbox">
-                            <Checkbox
-                                checked={manifestSelected?.items.some((i) => i.id === item.item.id) ?? false}
-                                onChange={() =>
-                                    onToggleItem(row.id, {
-                                    id: item.item.id,  // 👈 usar el id real del producto
-                                    cantidad: +item.cantidad,
-                                    })
-                                }
-                            />
-
-                        </TableCell>
                         <TableCell>{item.item.code}</TableCell>
                         <TableCell>{item.item.name}</TableCell>
+                        <TableCell>{item.item.categoria}</TableCell>
                         <TableCell>{traslateMedidas(item.item.unidad)}</TableCell>
-                        <TableCell>
-                            <InvoiceStatusCell
-                                isInvoiced={item.isInvoiced}
-                                manifestItemId={item.id}
-                                refetch={refetch}
-                            />
-                        </TableCell>
                         <TableCell align="right">{item.cantidad}</TableCell>
                         </TableRow>
                     ))}
@@ -218,20 +163,16 @@ function Row({
     );
 }
 
-function ManifestCommercialTable({ selected, onToggleItem, onToggleManifest, onQuotationCodeChange, manifests, refetch, totalCantidad, totalItems }: ManifestCommercialTableProps) {
+function ManifestCertificateTable({ manifests, onToggleManifest, onToggleManifests, selected }: ManifestCertificateTableProps) {
 
+    const manifestIds = manifests.map((manifest => (manifest.id)))
 
+    const areAllSelected = manifestIds.every((id) =>
+        selected.some((m) => m.id === id)
+    );
 
-    // const {mutate, isPending} = useMutation({
-    //     mutationFn: updateManifestItemPrice,
-    //     onSuccess: (data) => {
-    //         refetch()
-    //         toast.success(data)
-    //     },
-    //     onError: (error) => {
-    //         toast.error(error.message)
-    //     },
-    // });
+    const areSomeSelected =
+        manifestIds.some((id) => selected.some((m) => m.id === id)) && !areAllSelected;
 
     return (
         <>
@@ -239,7 +180,20 @@ function ManifestCommercialTable({ selected, onToggleItem, onToggleManifest, onQ
             <Table aria-label="collapsible table" size="small" stickyHeader>
             <TableHead>
                 <TableRow>
-                <TableCell sx={headerStyle}>✔</TableCell>
+                <TableCell padding="checkbox" sx={headerStyle}>
+                    <Checkbox
+                        sx={{
+                            color: '#fff',                               
+                            '&.Mui-checked': { color: '#fff' },          
+                            '&.MuiCheckbox-indeterminate': { color: '#fff' }, 
+                            '& .MuiSvgIcon-root': { fontSize: 22, filter: 'drop-shadow(0 0 1px rgba(0,0,0,0.4))' },
+                            '&:hover': { backgroundColor: 'rgba(255,255,255,0.12)' },
+                        }}
+                        checked={areAllSelected}
+                        indeterminate={areSomeSelected}
+                        onChange={() => onToggleManifests(manifestIds)}
+                    />
+                </TableCell>
                 <TableCell sx={headerStyle}>Items</TableCell>
                 <TableCell sx={headerStyle}>ID</TableCell>
                 <TableCell sx={headerStyle}>Cliente</TableCell>
@@ -255,34 +209,16 @@ function ManifestCommercialTable({ selected, onToggleItem, onToggleManifest, onQ
                     <Row
                         key={m.id}
                         row={m}
-                        selected={selected}
                         onToggleManifest={onToggleManifest}
-                        onToggleItem={onToggleItem}
-                        onQuotationCodeChange={onQuotationCodeChange}
-                        refetch={refetch}
+                        selected={selected}
                         index={index}
                     />
                 ))}
                 </TableBody>
             </Table>
         </TableContainer>
-
-        <div className="p-3 flex justify-between w-full mx-auto">
-            <p>
-                Total seleccionados: { ' ' }
-                <span className="font-bold text-azul">
-                    {totalItems} items
-                </span>
-            </p>
-            <p>
-                Total Cantidad: { ' ' }
-                <span className="font-bold text-azul">
-                    {totalCantidad}
-                </span>
-            </p>
-        </div>
         </>
     );
 }
 
-export default ManifestCommercialTable;
+export default ManifestCertificateTable;

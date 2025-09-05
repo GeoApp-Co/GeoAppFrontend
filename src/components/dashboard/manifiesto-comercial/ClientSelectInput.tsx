@@ -1,36 +1,51 @@
-"use client"
+"use client";
 
 import { getSelectClient } from "@/src/api/clientApi";
-import { ManifestCommerceSearchFormData, ManifestInvoiceSearchFormData, SearchManifestForm } from "@/src/types";
+import {
+    ManifestCommerceSearchFormData,
+    ManifestInvoiceSearchFormData,
+    SearchManifestForm,
+} from "@/src/types";
 import { useQuery } from "@tanstack/react-query";
 import debounce from "lodash.debounce";
 import { useEffect, useState } from "react";
 import { UseFormSetValue, UseFormWatch } from "react-hook-form";
 
 type ClientSelectInputProps = {
-    // Opcionales para comercio
+    // 👉 Modo con react-hook-form
     setValueCommerce?: UseFormSetValue<ManifestCommerceSearchFormData>;
     watchCommerce?: UseFormWatch<ManifestCommerceSearchFormData>;
 
-    // Opcionales para invoice
     setValueInvoice?: UseFormSetValue<ManifestInvoiceSearchFormData>;
     watchInvoice?: UseFormWatch<ManifestInvoiceSearchFormData>;
 
-    setValueManifest?: UseFormSetValue<SearchManifestForm>
-    watchManifest?: UseFormWatch<SearchManifestForm>
+    setValueManifest?: UseFormSetValue<SearchManifestForm>;
+    watchManifest?: UseFormWatch<SearchManifestForm>;
+
+    // 👉 Modo con estado normal
+    clientId?: string;
+    onChangeClientId?: (val: string) => void;
 };
 
 function ClientSelectInput({
     setValueCommerce,
     watchCommerce,
+
     setValueInvoice,
     watchInvoice,
+
     setValueManifest,
-    watchManifest
+    watchManifest,
+
+    clientId,
+    onChangeClientId,
 }: ClientSelectInputProps) {
-    // 👉 Escoge el watch disponible
+    // 👉 Escoge el valor de clientId dependiendo del modo
     const selectedClientId =
-        watchCommerce?.("clientId") ?? watchInvoice?.("clientId") ?? watchManifest?.("clientId");
+        clientId ??
+        watchCommerce?.("clientId") ??
+        watchInvoice?.("clientId") ??
+        watchManifest?.("clientId");
 
     const [search, setSearch] = useState("");
     const [showDropdown, setShowDropdown] = useState(false);
@@ -56,6 +71,29 @@ function ClientSelectInput({
         setShowInput(true);
         }
     }, [selectedClientId]);
+
+    const handleSelectClient = (id: string) => {
+        // react-hook-form
+        if (setValueCommerce) setValueCommerce("clientId", id);
+        else if (setValueInvoice) setValueInvoice("clientId", id);
+        else if (setValueManifest) setValueManifest("clientId", id);
+
+        // estado normal
+        if (onChangeClientId) onChangeClientId(id);
+
+        setShowDropdown(false);
+    };
+
+    const handleClearClient = () => {
+        if (setValueCommerce) setValueCommerce("clientId", "");
+        else if (setValueInvoice) setValueInvoice("clientId", "");
+        else if (setValueManifest) setValueManifest("clientId", "");
+
+        if (onChangeClientId) onChangeClientId("");
+
+        setSearch("");
+        setShowDropdown(false);
+    };
 
     return (
         <div className="relative w-full">
@@ -83,16 +121,7 @@ function ClientSelectInput({
                 <li
                 key={client.id}
                 className="px-4 py-2 hover:bg-blue-100 cursor-pointer"
-                onClick={() => {
-                    if (setValueCommerce) {
-                        setValueCommerce("clientId", client.id.toString());
-                    } else if (setValueInvoice) {
-                        setValueInvoice("clientId", client.id.toString());
-                    } else if (setValueManifest) {
-                        setValueManifest("clientId", client.id.toString());
-                    }
-                    setShowDropdown(false);
-                }}
+                onClick={() => handleSelectClient(client.id.toString())}
                 >
                 <span className="font-medium">{client.alias}</span>{" "}
                 <span className="text-xs text-gray-500">
@@ -132,18 +161,7 @@ function ClientSelectInput({
             </div>
             <button
                 type="button"
-                onClick={() => {
-                    if (setValueCommerce) {
-                        setValueCommerce("clientId", "");
-                    } else if (setValueInvoice) {
-                        setValueInvoice("clientId", "");
-                    } else if (setValueManifest) {
-                        setValueManifest("clientId", "");
-                    }
-                    setSearch("");
-                    setShowDropdown(false);
-                }}
-
+                onClick={handleClearClient}
                 className="ml-4 px-3 py-1 text-sm bg-red-100 text-red-700 rounded hover:bg-red-200"
             >
                 Limpiar
