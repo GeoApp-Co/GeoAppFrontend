@@ -91,10 +91,10 @@ function TemplateComboBox( {  manifestTemplate} : TemplateComboBoxProps) {
                                 data?.templates.map((template) => (
                                     <div
                                         key={template.id}
-                                className="flex flex-col p-4 bg-gray-100 rounded-md cursor-pointer hover:bg-gray-200"
-                                onClick={() => handleTemplateSelect(template)}
+                                        className="flex flex-col p-2 bg-gray-100 rounded-md cursor-pointer border-azul border-2 hover:bg-gray-200"
+                                        onClick={() => handleTemplateSelect(template)}
                                     >
-                                        <h3 className="text-lg font-medium">{template.name}</h3>
+                                        <h3 className="text-sm font-medium uppercase">{template.name}</h3>
                                         <span className="text-gray-600 text-sm">({template.items.length} ítems)</span>
                                     </div>
                                 ))
@@ -117,83 +117,83 @@ function TemplateComboBox( {  manifestTemplate} : TemplateComboBoxProps) {
 
                 {Object.entries(groupedItems).map(([categoria, items]) => {
 
-                const currentItems: ItemCantidad[] = watch("items") || [];
+                    const currentItems: ItemCantidad[] = watch("items") || [];
 
-                const totalCategoria = items.reduce((acc, item) => {
-                    const match = currentItems.find((i) => i.itemId === item.id);
-                    return acc + (match?.cantidad || 0);
-                }, 0);
+                    const totalCategoria = items.reduce((acc, item) => {
+                        const match = currentItems.find((i) => i.itemId === item.id);
+                        return acc + (match?.cantidad || 0);
+                    }, 0);
 
-                return (
-                    <div key={categoria} className="mb-6">
-                    <h4 className="text-md font-semibold text-gray-700 mb-2">{categoria}</h4>
-                    <table className="w-full text-sm text-left border border-gray-200 rounded-md">
-                        <thead>
-                        <tr className="bg-azul text-white text-sm">
-                            <th className="p-2">Código</th>
-                            <th className="p-2">Nombre</th>
-                            <th className="p-2">Unidad</th>
-                            <th className="p-2">Cantidad</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {items.map((m) => (
-                            <tr key={m.id} className="border-b hover:bg-blue-100">
-                            <td className="p-2">{m.code}</td>
-                            <td className="p-2">{m.name}</td>
-                            <td className="p-2">{traslateMedidas(m.unidad)}</td>
-                            <td className="p-2">
-                                <input
-                                    type="number"
-                                    {...register(`cantidad-${m.id}`, {
-                                        min: 0,
-                                        valueAsNumber: true,
-                                        onChange: (e) => {
-                                        const rawValue = e.target.value;
-
-                                        if (rawValue === "") {
-                                            // permitir vacío
-                                            const updatedItems = currentItems.map((item) =>
-                                            item.itemId === m.id ? { ...item, cantidad: 0 } : item
-                                            );
-                                            setValue("items", updatedItems);
-                                            return;
-                                        }
-
-                                        const validatedQuantity = transformAndValidateQuantity(rawValue);
-                                        if (validatedQuantity !== null) {
-                                            setValue(`cantidad-${m.id}`, validatedQuantity);
-
-                                            const updatedItems = currentItems.map((item) =>
-                                            item.itemId === m.id
-                                                ? { ...item, cantidad: validatedQuantity }
-                                                : item
-                                            );
-
-                                            setValue("items", updatedItems);
-                                        }
-                                        },
-                                    })}
-                                    placeholder="0.00"
-                                    step="0.01"
-                                    value={currentItems.find((i) => i.itemId === m.id)?.cantidad ?? ""} 
-                                    className="w-full px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-azul bg-white text-sm"
-                                />
-
-                            </td>
+                    return (
+                        <div key={categoria} className="mb-6">
+                        <h4 className="text-md font-semibold p-2 bg-azul text-white">{categoria}</h4>
+                        <table className="w-full text-sm text-left border border-gray-200 rounded-md">
+                            <thead>
+                            <tr className="bg-azul text-white text-sm">
+                                <th className="p-2">Código</th>
+                                <th className="p-2">Nombre</th>
+                                <th className="p-2">Unidad</th>
+                                <th className="p-2">Cantidad</th>
                             </tr>
-                        ))}
+                            </thead>
+                            <tbody>
+                            {items.map((m) => (
+                                <tr key={m.id} className="border-b hover:bg-blue-100">
+                                <td className="p-2">{m.code}</td>
+                                <td className="p-2">{m.name}</td>
+                                <td className="p-2">{traslateMedidas(m.unidad)}</td>
+                                <td className="p-2">
+                                    <input
+                                        type="number"
+                                        {...register(`cantidad-${m.id}`, {
+                                            min: 0,
+                                            valueAsNumber: true,
+                                            onChange: (e) => {
+                                            const rawValue = e.target.value;
 
-                        {/* Fila de sumatoria */}
-                        <tr className="bg-gray-100 font-semibold text-azul">
-                            <td></td>
-                            <td colSpan={2} className="p-2">Total - {categoria}</td>
-                            <td className="p-2">{totalCategoria.toFixed(2)}</td>
-                        </tr>
-                        </tbody>
-                    </table>
-                    </div>
-                );
+                                            if (rawValue === "") {
+                                                // permitir vacío
+                                                const updatedItems = currentItems.map((item) =>
+                                                item.itemId === m.id ? { ...item, cantidad: 0 } : item
+                                                );
+                                                setValue("items", updatedItems);
+                                                return;
+                                            }
+
+                                            const validatedQuantity = transformAndValidateQuantity(rawValue);
+                                            if (validatedQuantity !== null) {
+                                                setValue(`cantidad-${m.id}`, validatedQuantity);
+
+                                                const updatedItems = currentItems.map((item) =>
+                                                item.itemId === m.id
+                                                    ? { ...item, cantidad: validatedQuantity }
+                                                    : item
+                                                );
+
+                                                setValue("items", updatedItems);
+                                            }
+                                            },
+                                        })}
+                                        placeholder="0.00"
+                                        step="0.01"
+                                        value={currentItems.find((i) => i.itemId === m.id)?.cantidad ?? ""} 
+                                        className="w-full px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-azul bg-white text-sm"
+                                    />
+
+                                </td>
+                                </tr>
+                            ))}
+
+                            {/* Fila de sumatoria */}
+                            <tr className="bg-gray-100 font-semibold text-azul">
+                                <td></td>
+                                <td colSpan={2} className="p-2">Total - {categoria}</td>
+                                <td className="p-2">{totalCategoria.toFixed(2)}</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        </div>
+                    );
                 })}
 
             </div>

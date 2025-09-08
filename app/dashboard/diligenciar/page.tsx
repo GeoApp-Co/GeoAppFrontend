@@ -199,17 +199,6 @@ function NewManifestPage() {
                     }}
                 />
                 </div>
-
-                {/* Campo: Observaciones */}
-                <div className="md:col-span-2">
-                <label className="text-azul font-bold block text-sm mb-1">Observaciones</label>
-                <textarea
-                    {...register("observations")}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 bg-white focus:border-indigo-500 outline-none transition-all"
-                    placeholder="Observaciones..."
-                    rows={4}
-                />
-                </div>
             </div>
 
             <TemplateComboBox />
@@ -219,6 +208,17 @@ function NewManifestPage() {
                 setValue={methods.setValue}
 
             />
+
+            {/* Campo: Observaciones */}
+            <div className="md:col-span-2">
+            <label className="text-azul font-bold block text-sm mb-1">Observaciones</label>
+            <textarea
+                {...register("observations")}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 bg-white focus:border-indigo-500 outline-none transition-all"
+                placeholder="Observaciones..."
+                rows={4}
+            />
+            </div>
 
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">

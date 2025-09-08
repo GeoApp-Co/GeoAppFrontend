@@ -1,17 +1,17 @@
 "use client"
-import { ManifestCommerceSearchFormData, ManifestInvoiceSearchFormData } from '@/src/types'
-import Heading from '@/src/UI/Heading'
-import React, { useState } from 'react'
-import { selectedItem, selectedManifest } from '../manifiesto-comercial/DashboardCommercialManifesto'
-import { useMutation, useQuery } from '@tanstack/react-query'
 import { getInvoiceManifest, updateManifestInvoiceCode } from '@/src/api/manifestApi'
-import ManifestInvoicePagination from './ManifestInvoicePagination'
+import { ManifestInvoiceSearchFormData } from '@/src/types'
+import Heading from '@/src/UI/Heading'
 import { Button } from '@mui/material'
+import { useMutation, useQuery } from '@tanstack/react-query'
+import { useState } from 'react'
+import { selectedItem, selectedManifest } from '../manifiesto-comercial/DashboardCommercialManifesto'
+import ManifestInvoicePagination from './ManifestInvoicePagination'
 
 import SaveIcon from '@mui/icons-material/Save'
-import ManifestInvoiceTable from './ManifestInvoiceTable'
 import { toast } from 'react-toastify'
 import ManifestInvoiceSearchForm from './ManifestInvoiceSearchForm'
+import ManifestInvoiceTable from './ManifestInvoiceTable'
 
 type DashboardBillingManifestoProps = {
     page: number
@@ -22,7 +22,7 @@ export type selectedManifestInvoice = Pick<selectedManifest, 'id' | 'items'> & {
 }
 
 function DashboardBillingManifesto( { page } : DashboardBillingManifestoProps) {
-    const limit = 20
+    const limit = 10
 
     // 🟢 estado para los filtros (inicia vacío)
     const [filters, setFilters] = useState<ManifestInvoiceSearchFormData>({

@@ -30,7 +30,7 @@ export type selectedManifest ={
 
 
 function DashboardCommercialManifesto({ page }: DashboardCommercialManifestoProps) {
-    const limit = 20
+    const limit = 10
 
     // 🟢 estado para los filtros (inicia vacío)
     const [filters, setFilters] = useState<ManifestCommerceSearchFormData>({

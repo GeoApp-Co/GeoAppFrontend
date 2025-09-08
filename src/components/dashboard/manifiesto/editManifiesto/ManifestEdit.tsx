@@ -16,6 +16,7 @@ import TemplateComboBox from "../newManifiesto/TemplateComboBox"
 import { getTemplateById } from "@/src/api/templateApi"
 import { useEffect, useMemo } from "react"
 import { toast } from "react-toastify"
+import LoaderPage from "@/src/UI/loaders/LoaderPage"
 
 type ManifestEditProps = {
     id: string
@@ -27,7 +28,7 @@ function ManifestEdit( { id } : ManifestEditProps) {
     const router = useRouter()
     const { user } = useAuth()
 
-    const { data } = useQuery({
+    const { data, isLoading} = useQuery({
         queryKey: [ 'manifest', id],
         queryFn: () => getManifestById({manifestId: id}),
         enabled: !!id
@@ -79,6 +80,8 @@ function ManifestEdit( { id } : ManifestEditProps) {
             });
         }
     }, [data, methods]);
+
+    if (isLoading) return <LoaderPage/>
 
     if (data) return (
         <div className="max-w-4xl mx-auto mt-10 p-3 bg-white shadow-lg rounded-md space-y-1">
