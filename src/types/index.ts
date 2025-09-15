@@ -1,21 +1,23 @@
 import z from "zod"
-import {  certificateSchema, certificateType, ClienteSchema, itemCategoryEnum, ItemSchema, manifesPreviewtSchema, manifestCertificateSchema, manifestCommercialSchema, manifestInvoiceSchema, ManifestItemSchema, paginationManifestCommercialSchema, roles, templateSchema, unidades, userSchema } from "../schemas"
+import {  CarSchema, certificateSchema, certificateType, ClienteSchema, itemCategoryEnum, ItemSchema, manifesPreviewtSchema, manifestCertificateSchema, manifestCommercialSchema, manifestInvoiceSchema, ManifestItemSchema, manifestSchema, paginationManifestCommercialSchema, paginationManifestInvoicelSchema, responsePaginationSchema, roles, templateSchema, unidades, userSchema } from "../schemas"
 
 export type User = {
     name: string
     cc: string
 }
 
+export type ResponsePaginationType = z.infer<typeof responsePaginationSchema>
+
 export type ItemCategoryType = z.infer<typeof itemCategoryEnum>
 
 export type CertificateType = z.infer<typeof certificateType>
 
 export type GroupedItems = {
-    [key in ItemCategoryType]?: Pick<ManifestItemType, 'id' | 'cantidad' | 'item' >[];
+    [key in ItemCategoryType]?: Pick<ManifestItemType, 'id' | 'cantidad' | 'item' | 'volDesechos' | 'nHoras'|'nViajes'>[];
 };
 
 export type GroupedItemsForm = {
-    [key in ItemCategoryType]?: Pick<ItemType, 'id' | 'unidad' | 'categoria' | 'code'  | 'name' >[];
+    [key in ItemCategoryType]?: Pick<ItemType, 'id' | 'unidad' | 'categoria' | 'code'  | 'name'> [];
 };
 
 export type Medidas = z.infer<typeof unidades>
@@ -51,6 +53,7 @@ export type ManifestCommerceSearchFormData = {
     item?: string;
     manifestId: string
     quotationCode: string; 
+    invoiceCode: string;
     isInvoiced: "" | "true" | "false";
 };
 
@@ -62,12 +65,15 @@ export type ManifestInvoiceSearchFormData = ManifestCommerceSearchFormData & {
 export type ItemCantidad = {
     itemId: number
     cantidad: number
+    volDesechos?: number
+    nViajes?: number
+    nHoras?: number
 }
 
 export type NewManifestFormType = {
     clientId: number
     manifestTemplateId: number
-    plate: string
+    plateId: number
     date: Date
     dateFinal: Date
     observations: string
@@ -78,6 +84,7 @@ export type NewManifestFormType = {
     location: string
     contactClient: string;
     positionClient: string;
+    phone: string
 }
 
 export type NewCertificateType = {
@@ -91,6 +98,8 @@ export type UpdateManifestFormType = {
     manifestTemplateId: number
     items: ItemCantidad[],
 }
+
+export type NewCarForm = Pick<CarType, 'carType' | 'plate'>
 
 
 type QuotationCode = {
@@ -117,6 +126,7 @@ export type ClienteCellType = Pick<
 >;
 
 export type ManifestType = z.infer<typeof manifesPreviewtSchema>
+export type ManifestByIdType = z.infer<typeof manifestSchema>
 export type ManifestItemType = z.infer<typeof ManifestItemSchema>
 export type ManifestCommerceType = z.infer<typeof manifestCommercialSchema>
 export type ManifestInvoiceType = z.infer<typeof manifestInvoiceSchema>
@@ -124,6 +134,11 @@ export type ManifestCertificateType = z.infer<typeof manifestCertificateSchema>
 export type ItemType = z.infer<typeof ItemSchema>
 export type TemplateType = z.infer<typeof templateSchema>
 export type UserType = z.infer<typeof userSchema>
+export type CarType = z.infer<typeof CarSchema>
+
+// export type ResponseManifestInvoiceType = ManifestByIdType[] & ResponsePaginationType
+export type ResponseManifestInvoiceType = z.infer<typeof paginationManifestInvoicelSchema>
+
 
 export type CertificateClientType  = z.infer<typeof certificateSchema>
 
@@ -134,7 +149,7 @@ export type CertificateClientType  = z.infer<typeof certificateSchema>
 //     item
 // };
 
-export type NewClientFormType = Pick<ClienteType, 'alias' | 'email' | 'identificacion' | 'identificacionType' | 'name' | 'ubicacion' | 'direccion' | 'personaType' >
+export type NewClientFormType = Pick<ClienteType, 'alias' | 'email' | 'identificacion' | 'identificacionType' | 'name' | 'ubicacion' | 'direccion' | 'personaType' | 'phone1' | 'phone2' >
 export type NewItemFormType = Pick<ItemType, 'code' | 'name' | 'unidad' | 'categoria' >
 export type NewTemplateFormType = Pick<TemplateType, 'name' > & {
     itemIds: number[]

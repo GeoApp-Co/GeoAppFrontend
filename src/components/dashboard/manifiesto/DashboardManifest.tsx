@@ -18,7 +18,7 @@ export default function DashboardManifest({ page }: { page: number }) {
 
     return (
         <div>
-            <Heading>Lista de Servicios</Heading>
+            <Heading>Lista de Manifiesto/Servicios</Heading>
 
             <div className="grid grid-cols-1 gap-3 mt-5 ">
 

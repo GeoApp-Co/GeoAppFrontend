@@ -21,7 +21,7 @@ function NewItemPage() {
         categoria: 'OTRO'
     }
 
-    const { register, handleSubmit, formState: {errors}} = useForm({
+    const { register, handleSubmit, formState: {errors}, watch, setValue} = useForm({
         defaultValues: initialValues
     })
 
@@ -62,6 +62,8 @@ function NewItemPage() {
             <ItemForm 
                 register={register}
                 errors={errors}
+                watch={watch}
+                setValue={setValue}
             />
 
             <button

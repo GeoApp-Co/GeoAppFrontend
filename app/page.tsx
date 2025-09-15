@@ -13,7 +13,7 @@ const navigation = [
   },
   {
     url: "/dashboard/manifiesto",
-    text: "Lista de Servicios",
+    text: "Lista de Manifiestos/Servicios",
     descripcion: "Administra los manifiestos / servicios creados",
     role: ["admin", "conductor", 'superAdmin', 'comercio', 'factura', 'operacion'],
   },
@@ -27,12 +27,6 @@ const navigation = [
     url: "/dashboard/manifiesto-facturacion",
     text: "Área de Facturacion",
     descripcion: "Administra los manifiestos / Facturación",
-    role: ["admin", "factura", 'superAdmin'],
-  },
-  {
-    url: "/dashboard/certificado",
-    text: "Certificación",
-    descripcion: "Agrupa servicios y crea los certificados",
     role: ["admin", "factura", 'superAdmin'],
   },
   {
@@ -58,6 +52,18 @@ const navigation = [
     text: "Usuarios",
     descripcion: "Gestiona los usuarios y sus roles",
     role: ["superAdmin"],
+  },
+  {
+    url: "/dashboard/vehiculos",
+    text: "Vehículos",
+    descripcion: "Agrega y Modifica los vehículos con sus placas",
+    role: ["admin", "operacion", 'superAdmin'],
+  },
+  {
+    url: "/dashboard/certificado",
+    text: "Certificación",
+    descripcion: "Agrupa servicios y crea los certificados",
+    role: ["admin", "factura", 'superAdmin'],
   },
 ]
 

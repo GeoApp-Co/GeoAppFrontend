@@ -1,7 +1,6 @@
 import { isAxiosError } from "axios";
 import { NewCertificateType } from "../types"
 import api from "../config/axios";
-import { da } from "zod/v4/locales";
 import { paginationCertificatesSchema } from "../schemas";
 
 type CertificateType = {

@@ -15,20 +15,23 @@ export const identificacionType = z.enum([
 ]);
 export const itemCategoryEnum = z.enum([
     "RESIDUOS ESPECIALES",
-    "RESIDUOS DE APROVECHAMIENTO",
+    "RESIDUOS APROVECHABLES",
     "RESIDUOS NO APROVECHABLES",
     "RESIDUOS HOSPITALARIOS",
     "RESIDUOS PELIGROSOS SOLIDOS",
-    "RESIDUOS LIQUIDOS",
+    "RESIDUOS PELIGROSOS LIQUIDOS",
     "SUMINISTRO",
+    "SERVICIO",
+    "ESPECIAL",
     "OTRO"
 ]);
 export const personaType = z.enum(["natural", "juridica"]);
 export const certificateType = z.enum([
     "CERTIFICADO DE GESTIÓN INTEGRAL DE RESIDUOS"
 ]);
+export const carTypeEnum = z.enum(["CAMIONETA", "COMPACTADOR", "FURGON", "VOLQUETA"]);
 
-const responsePaginationSchema = z.object({
+export const responsePaginationSchema = z.object({
     total: z.number(),
     totalPages: z.number(),
     currentPage: z.number(),
@@ -64,6 +67,11 @@ export const paginationUsersSchema = responsePaginationSchema.pick({
     users: z.array(userSchema)
 })
 
+export const CarSchema = z.object({
+    id: z.number(),
+    carType: carTypeEnum,
+    plate: z.string()
+})
 
 export const ItemSchema = z.object({
     id: z.number(),
@@ -92,6 +100,9 @@ export const ManifestItemSchema = z.object({
     // manifestId: z.number(),
     itemId: z.number(),
     cantidad: z.string(),
+    volDesechos: z.string().nullable(),
+    nViajes: z.number().nullable(),
+    nHoras: z.string().nullable(),
     // createdAt: z.string(),
     // updatedAt: z.string(),
     isInvoiced: z.boolean(),
@@ -113,8 +124,8 @@ export const ClienteSchema = z.object({
     identificacion: z.string(),
     email: z.string(),
     direccion: z.string(),
-    // contacto: z.string(),
-    // telefono: z.string(),
+    phone1: z.string(),
+    phone2: z.string(),
     ubicacion: z.string(),
     // createdAt: z.string(),
     // updatedAt: z.string()
@@ -148,7 +159,7 @@ const ManifestTemplateSchema = z.object({
 
 export const ManifestSchema = z.object({
     id: z.number(),
-    plate: z.string(),
+    // plate: z.string(),
     location: z.string().nullable(),
     date: z.string(),
     dateFinal: z.string(),
@@ -158,17 +169,21 @@ export const ManifestSchema = z.object({
     observations: z.string().nullable(),
     createdBy: z.number(),
     isInvoiced: z.boolean(),
-    isInternallyInvoiced: z.boolean(),
-    isCertified: z.boolean(),
+    // isInternallyInvoiced: z.boolean(),
+    // isCertified: z.boolean(),
     quotationCode: z.string().nullable(),
     invoiceCode: z.string().nullable(),
     isEdit: z.boolean(),
     contactClient: z.string(),
     positionClient: z.string(),
+    phone: z.string(),
     manifestItems: z.array(ManifestItemSchema.pick({
         id: true,
         cantidad: true,
         item: true,
+        nHoras: true,
+        nViajes: true,
+        volDesechos: true,
     })),
     cliente: ClienteSchema.pick({
         alias: true,
@@ -179,15 +194,20 @@ export const ManifestSchema = z.object({
         identificacionType: true,
         name: true,
         ubicacion: true,
-        direccion: true
+        direccion: true,
+        phone1: true,
+        phone2: true
     }),
     user: UserSchema,
-    manifestTemplate: ManifestTemplateSchema
+    manifestTemplate: ManifestTemplateSchema,
+    car: CarSchema.pick({
+        carType: true,
+        plate: true
+    })
 });
 
 export const manifestSchema = ManifestSchema.pick({
     id:true,
-    plate: true,
     location: true,
     date: true,
     dateFinal: true,
@@ -197,14 +217,16 @@ export const manifestSchema = ManifestSchema.pick({
     observations: true,
     createdBy: true,
     isInvoiced: true,
-    isInternallyInvoiced: true,
-    isCertified: true,
+    // isInternallyInvoiced: true,
+    // isCertified: true,
     contactClient: true,
     positionClient: true,
     manifestItems: true,
     cliente: true,
     user: true,
     manifestTemplate: true,
+    car: true,
+    phone: true
 })
 
 export const manifestCommercialSchema = ManifestSchema.pick({
@@ -212,7 +234,8 @@ export const manifestCommercialSchema = ManifestSchema.pick({
     date: true,
     isInvoiced: true,
     location: true,
-    quotationCode: true
+    quotationCode: true,
+    invoiceCode: true
 }).extend({
     cliente: ClienteSchema.pick({
         id: true,
@@ -234,7 +257,8 @@ export const manifestCommercialSchema = ManifestSchema.pick({
             id: true,
             code: true,
             name: true,
-            unidad: true
+            unidad: true,
+            categoria: true
         })
     }))
 })
@@ -268,7 +292,8 @@ export const manifestInvoiceSchema = ManifestSchema.pick({
             id: true,
             code: true,
             name: true,
-            unidad: true
+            unidad: true,
+            categoria: true
         })
     }))
 })
@@ -335,8 +360,9 @@ export const manifesPreviewtSchema = ManifestSchema.pick({
     id: true,
     date: true, 
     isInvoiced: true,
-    isInternallyInvoiced: true,
-    isCertified: true,
+    // isInternallyInvoiced: true,
+    // isCertified: true,
+    manifestTemplate: true
 }).extend({
     cliente: ClienteSchema.pick({
         id: true,
@@ -410,4 +436,8 @@ export const paginationCertificatesSchema = responsePaginationSchema.pick({
 }).extend({
     certificates: z.array(
 certificateSchema)
+})
+
+export const responseCarsSchema = z.object({
+    cars: z.array(CarSchema)
 })

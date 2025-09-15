@@ -34,7 +34,8 @@ export async function getManifest( {  limit, page, estado, clientId, fecha, mani
         }) 
 
         const response = paginationManifestSchema.safeParse(data)
-
+        console.log(response.error);
+        
         if (response.success) {
             return response.data
         }
@@ -80,7 +81,7 @@ export async function getInvoiceManifest({  limit, page, clientId, fechaMes, ite
     }
 }
 
-export async function getCommercialManifest({  limit, page, clientId, fechaMes, item, location, manifestTemplate, manifestId, quotationCode, isInvoiced } : Pick<ManifestType, 'limit' | 'page' | 'clientId' | 'fechaMes' | 'item' | 'manifestTemplate' | 'location' | 'manifestId' | 'quotationCode' | 'isInvoiced' >) {
+export async function getCommercialManifest({  limit, page, clientId, fechaMes, item, location, manifestTemplate, manifestId, quotationCode, isInvoiced, invoiceCode } : Pick<ManifestType, 'limit' | 'page' | 'clientId' | 'fechaMes' | 'item' | 'manifestTemplate' | 'location' | 'manifestId' | 'quotationCode' | 'isInvoiced' | 'invoiceCode' >) {
     try {
         const url = '/manifests/commercial'
         const { data } = await api.get(url, {
@@ -94,6 +95,7 @@ export async function getCommercialManifest({  limit, page, clientId, fechaMes, 
                 manifestTemplate,
                 manifestId,
                 quotationCode,
+                invoiceCode,
                 isInvoiced
             }
         })
@@ -163,6 +165,7 @@ export async function getManifestById({ manifestId } : Pick<ManifestType, 'manif
 
         const response = manifestSchema.safeParse(data)
         
+        
         if (response.success) {
             return response.data
         }
@@ -211,6 +214,7 @@ export async function updateManifestQuotationCode({ quotationCodeFormType } : Pi
 export async function createManifest( { formData } : Pick<ManifestType, 'formData' >) {
     try {
         const url = '/manifests'
+        
         const { data } = await api.post<number>(url, formData)
 
         return data

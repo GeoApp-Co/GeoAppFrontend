@@ -5,3 +5,11 @@
     --color-verde: #a3c614;
     --font-sans: ui-sans-serif, system-ui, sans-serif;
 }
+
+@media print {
+    .print-break-inside-avoid {
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+    
+}

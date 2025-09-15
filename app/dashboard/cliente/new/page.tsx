@@ -22,7 +22,9 @@ function NewClientePage() {
         ubicacion: '',
         identificacionType: 'nit',
         direccion: '',
-        personaType: 'juridica'
+        personaType: 'juridica',
+        phone1: '',
+        phone2: ''
     }
 
     const { register, handleSubmit, formState: {errors}, watch} = useForm({

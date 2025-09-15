@@ -26,6 +26,7 @@ export async function getItems( { limit, page, search, categoria } : Pick<ItemTy
         })
 
         const response = paginatioItemsSchema.safeParse(data)
+        
 
         if (response.success) {
             return response.data

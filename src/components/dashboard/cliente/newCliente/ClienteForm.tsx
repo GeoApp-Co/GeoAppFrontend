@@ -113,6 +113,42 @@ function ClienteForm({ errors, register, watch }: ClienteFormProps) {
                 {errors.email && <ErrorMessage>{errors.email.message}</ErrorMessage>}
             </div>
 
+            {/* Teléfono 1 */}
+            <div >
+                <label className="text-azul font-bold block text-sm mb-1">Primer Teléfono</label>
+                <input
+                    type="text"
+                    {...register("phone1", {
+                        required: "El Primer teléfono es obligatoria",
+                        pattern: {
+                        value: /^[0-9+\-\s()]+$/,
+                        message: "El teléfono solo puede contener números, espacios, guiones, paréntesis y el signo +"
+                    },
+                    })}
+                    className="w-full bg-white px-4 py-2 border border-gray-300 rounded-lg"
+                    placeholder="Primer Teléfono"
+                />
+                {errors.direccion && <ErrorMessage>{errors.direccion.message}</ErrorMessage>}
+            </div>
+
+            {/* Teléfono 2*/}
+            <div >
+                <label className="text-azul font-bold block text-sm mb-1">Segundo Teléfono</label>
+                <input
+                    type="text"
+                    {...register("phone2", {
+                        required: "El Segundo teléfono es obligatoria",
+                        pattern: {
+                        value: /^[0-9+\-\s()]+$/,
+                        message: "El teléfono solo puede contener números, espacios, guiones, paréntesis y el signo +"
+                    },
+                    })}
+                    className="w-full bg-white px-4 py-2 border border-gray-300 rounded-lg"
+                    placeholder="Segundo Teléfono"
+                />
+                {errors.direccion && <ErrorMessage>{errors.direccion.message}</ErrorMessage>}
+            </div>
+
             {/* Ubicación */}
             <div>
                 <label className="text-azul font-bold block text-sm mb-1">Ubicación</label>
@@ -128,7 +164,7 @@ function ClienteForm({ errors, register, watch }: ClienteFormProps) {
             </div>
 
             {/* Dirección */}
-            <div className="md:col-span-2">
+            <div >
                 <label className="text-azul font-bold block text-sm mb-1">Dirección</label>
                 <input
                     type="text"
@@ -140,6 +176,8 @@ function ClienteForm({ errors, register, watch }: ClienteFormProps) {
                 />
                 {errors.direccion && <ErrorMessage>{errors.direccion.message}</ErrorMessage>}
             </div>
+
+            
         </div>
     );
 }

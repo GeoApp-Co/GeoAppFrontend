@@ -15,6 +15,7 @@ import { toast } from "react-toastify"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/src/hooks/useAuth"
 import { traslateRoles } from "@/src/utils"
+import SelectCar from "@/src/components/dashboard/manifiesto/newManifiesto/SelectCar"
 
 function NewManifestPage() {
 
@@ -29,7 +30,7 @@ function NewManifestPage() {
         defaultValues: {
             clientId: 0,
             manifestTemplateId: 0,
-            plate: '',
+            plateId: 0,
             date: now,
             dateFinal: oneHourLater,
             observations: '',
@@ -39,7 +40,8 @@ function NewManifestPage() {
             signatureClient: '',
             location: '',
             contactClient: '',
-            positionClient: ''
+            positionClient: '',
+            phone: ''
         }
     })
 
@@ -72,15 +74,14 @@ function NewManifestPage() {
         if (!formData.clientId || formData.clientId === 0) {
             errors.push("Debes seleccionar un cliente.")
         }
-
+        
         if (!formData.manifestTemplateId || formData.manifestTemplateId === 0) {
             errors.push("Debes seleccionar una plantilla de manifiesto.")
         }
-
-        if (!formData.plate || formData.plate.trim() === "") {
-            errors.push("La placa no puede estar vacía.")
+        if (!formData.plateId || formData.plateId === 0) {
+            errors.push("Debes seleccionar una placa de vehículo.")
         }
-        if (!formData.contactClient || formData.plate.trim() === "") {
+        if (!formData.contactClient || formData.contactClient.trim() === "") {
             errors.push("La Nombre del contacto no puede estar vacío.")
         }
         if (!formData.positionClient || formData.positionClient.trim() === "") {
@@ -112,7 +113,7 @@ function NewManifestPage() {
             errors.forEach((err) => toast.error(err))
             return
         }
-
+        
         // Si todo está OK, enviar los datos
         mutate({ formData })
     })
@@ -124,15 +125,16 @@ function NewManifestPage() {
         <FormProvider {...methods}>
             <form
             onSubmit={onSubmit}
-            className="flex flex-col gap-5 w-[80%] mx-auto max-w-3xl mt-5"
+            className="flex flex-col gap-5 w-[80%]   max-w-5xl mx-auto mt-2 p-6 bg-white shadow-lg rounded-md space-y-6 print:max-w-full print:shadow-none print:rounded-none print:p-2 print:space-y-2 print:text-[11px]"
             >
                 
             <ClientComboBox />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 ">
 
                 {/* Campo: Placa */}
-                <div>
+                <SelectCar/>
+                {/* <div>
                 <label className="text-azul font-bold block text-sm mb-1">Placa del vehículo</label>
                 <input
                     type="text"
@@ -140,7 +142,7 @@ function NewManifestPage() {
                     className="w-full bg-white px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
                     placeholder="Placa del vehículo"
                 />
-                </div>
+                </div> */}
 
                 {/* Campo: Ubicacón */}
                 <div>
@@ -252,28 +254,37 @@ function NewManifestPage() {
                 </div>
 
                 <div>
-                <label className="text-azul font-bold block text-sm mb-1">Firma del Cliente</label>
-                <ButtonSignature input={'signatureClient'} />
+                    <label className="text-azul font-bold block text-sm mb-1">Firma del Cliente</label>
+                    <ButtonSignature input={'signatureClient'} />
 
-                <div className="mt-3">
-                    <label className="text-azul font-bold block text-sm mb-1">Nombre del contacto del cliente</label>
-                    <input
-                    type="text"
-                    {...register("contactClient")}
-                    className="w-full bg-white px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
-                    placeholder="Nombre del contacto"
-                    />
-                </div>
+                    <div className="mt-3">
+                        <label className="text-azul font-bold block text-sm mb-1">Nombre del contacto del cliente</label>
+                        <input
+                        type="text"
+                        {...register("contactClient")}
+                        className="w-full bg-white px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
+                        placeholder="Nombre del contacto"
+                        />
+                    </div>
 
-                <div className="mt-3">
-                    <label className="text-azul font-bold block text-sm mb-1">Cargo del contacto del cliente</label>
-                    <input
-                    type="text"
-                    {...register("positionClient")}
-                    className="w-full bg-white px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
-                    placeholder="Cargo del contacto"
-                    />
-                </div>
+                    <div className="mt-3">
+                        <label className="text-azul font-bold block text-sm mb-1">Cargo del contacto del cliente</label>
+                        <input
+                        type="text"
+                        {...register("positionClient")}
+                        className="w-full bg-white px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
+                        placeholder="Cargo del contacto"
+                        />
+                    </div>
+                    <div className="mt-3">
+                        <label className="text-azul font-bold block text-sm mb-1">Teléfono del contacto del cliente</label>
+                        <input
+                        type="text"
+                        {...register("phone")}
+                        className="w-full bg-white px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
+                        placeholder="Teléfono del contacto"
+                        />
+                    </div>
                 </div>
                 
             </div>

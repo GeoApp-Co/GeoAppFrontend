@@ -7,11 +7,12 @@ import { useMutation, useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 import { selectedItem, selectedManifest } from '../manifiesto-comercial/DashboardCommercialManifesto'
 import ManifestInvoicePagination from './ManifestInvoicePagination'
-
 import SaveIcon from '@mui/icons-material/Save'
 import { toast } from 'react-toastify'
 import ManifestInvoiceSearchForm from './ManifestInvoiceSearchForm'
 import ManifestInvoiceTable from './ManifestInvoiceTable'
+import CardTotal from '@/src/UI/manifest/CardTotal'
+import { ManifestTableSkeleton } from '../manifiesto-comercial/ManifestTableSkeleton'
 
 type DashboardBillingManifestoProps = {
     page: number
@@ -40,7 +41,7 @@ function DashboardBillingManifesto( { page } : DashboardBillingManifestoProps) {
     const [selected, setSelected] = useState<selectedManifestInvoice[]>([]);
 
     const { data, isLoading, refetch } = useQuery({
-        queryKey: ['manifestsInvoice', page, limit, filters], // 👈 depende de los filtros
+        queryKey: ['manifestsInvoice', page, limit, filters], 
         queryFn: () => getInvoiceManifest({ page, limit, ...filters }),
     })
 
@@ -56,6 +57,7 @@ function DashboardBillingManifesto( { page } : DashboardBillingManifestoProps) {
         },
     })
 
+    // ✅ Seleccionar/deseleccionar todo el manifiesto
     const handleToggleManifest = (
         manifestId: number,
         items: selectedItem[]
@@ -63,12 +65,14 @@ function DashboardBillingManifesto( { page } : DashboardBillingManifestoProps) {
     setSelected((prev) => {
         const manifestIndex = prev.findIndex((m) => m.id === manifestId);
 
+        // const itemsIsVoiced =  items.filter((item) => item.isVoiced )
+
         if (manifestIndex === -1) {
         // 🚀 No existe → lo agregamos con todos los items
         return [...prev, { id: manifestId, invoiceCode: '', items }];
         }
-
         const newSelected = [...prev];
+
         const manifest = newSelected[manifestIndex];
 
         if (manifest.items.length === items.length) {
@@ -90,13 +94,17 @@ function DashboardBillingManifesto( { page } : DashboardBillingManifestoProps) {
     ) => {
     setSelected((prev) => {
         const manifestIndex = prev.findIndex((m) => m.id === manifestId);
+        const newSelected = [...prev];
+
+        if (!item.isVoiced) {
+            return newSelected
+        }
 
         if (manifestIndex === -1) {
         // 🚀 No existe → agregamos este item
         return [...prev, { id: manifestId, invoiceCode: '', items: [item] }];
         }
 
-        const newSelected = [...prev];
         const manifest = { ...newSelected[manifestIndex] };
         const items = [...manifest.items];
 
@@ -163,16 +171,29 @@ function DashboardBillingManifesto( { page } : DashboardBillingManifestoProps) {
                 <ManifestInvoiceSearchForm setFilters={setFilters} />
             </div>
 
+            {/* 🔄 SKELETON - Mostrar mientras carga */}
             {isLoading && (
-                <h2 className='text-azul text-xl text-center font-black mt-10'>
-                    Cargando Datos...
-                </h2>
+                <div className="py-5">
+                    <div className="mb-4">
+                        {/* Skeleton del botón */}
+                        <div className="w-full h-8 bg-gray-200 rounded animate-pulse"></div>
+                    </div>
+                    {/* Skeleton de la tabla */}
+                    <ManifestTableSkeleton rows={limit} />
+                </div>
             )}
 
-            {!isLoading && data?.manifests.length == 0 && (
-                <h2 className="text-azul text-xl text-center font-black mt-10">
-                    No Hay Resultados
-                </h2>
+            {/* 📭 ESTADO VACÍO - No hay resultados */}
+            {!isLoading && data?.manifests.length === 0 && (
+                <div className="text-center py-12">
+                    <div className="text-6xl mb-4">📋</div>
+                    <h2 className="text-azul text-xl font-black mb-2">
+                        No hay manifiestos
+                    </h2>
+                    <p className="text-gray-500">
+                        No se encontraron manifiestos con los filtros aplicados
+                    </p>
+                </div>
             )}
 
             {data && data.manifests.length > 0 &&
@@ -204,6 +225,13 @@ function DashboardBillingManifesto( { page } : DashboardBillingManifestoProps) {
                 <ManifestInvoicePagination
                     page={data.currentPage}
                     totalPages={data.totalPages}
+                />
+            }
+
+            {selected.length > 0 && 
+                <CardTotal 
+                    selectedItems={selected} 
+                    manifestType="invoice" 
                 />
             }
         

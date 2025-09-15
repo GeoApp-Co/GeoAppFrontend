@@ -1,17 +1,17 @@
 "use client";
 
-import { IconButton, Tooltip } from "@mui/material";
+import { changeIsEditManifest } from "@/src/api/manifestApi";
+import { ManifestType, ResponseManifestInvoiceType } from "@/src/types";
 import LockIcon from "@mui/icons-material/Lock";
 import LockOpenIcon from "@mui/icons-material/LockOpen";
+import { IconButton, Tooltip } from "@mui/material";
 import { QueryObserverResult, RefetchOptions, useMutation } from "@tanstack/react-query";
-import { changeIsEditManifest } from "@/src/api/manifestApi";
 import { toast } from "react-toastify";
-import { ManifestType, PaginationManifestCommercialType } from "@/src/types";
 
 type EditLockButtonProps = {
   isEdit: boolean;
   manifestId: number
-  refetch: (options?: RefetchOptions | undefined) => Promise<QueryObserverResult<PaginationManifestCommercialType | undefined, Error>>
+    refetch: (options?: RefetchOptions | undefined) => Promise<QueryObserverResult<ResponseManifestInvoiceType | undefined, Error>>
 };
 
 export default function EditLockButton({ isEdit, manifestId, refetch}: EditLockButtonProps) {

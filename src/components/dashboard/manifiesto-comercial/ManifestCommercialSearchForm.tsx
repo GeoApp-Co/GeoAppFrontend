@@ -28,6 +28,8 @@ function ManifestCommercialSearchForm({ setFilters }: Props) {
         manifestTemplate: "",
         location: "",
         item: "",
+        invoiceCode: "",
+        quotationCode: ""
         },
     });
 
@@ -39,6 +41,7 @@ function ManifestCommercialSearchForm({ setFilters }: Props) {
             const newFilters: ManifestCommerceSearchFormData = {
                 clientId: values.clientId || "",
                 quotationCode: values.quotationCode || '',
+                invoiceCode: values.invoiceCode || '',
                 fechaMes: values.fechaMes || null,
                 manifestTemplate: values.manifestTemplate || "",
                 location: values.location || "",
@@ -103,6 +106,17 @@ function ManifestCommercialSearchForm({ setFilters }: Props) {
                     type="text"
                     {...register("quotationCode")}
                     placeholder="Buscar por código de cotización"
+                    className="w-full bg-white px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-azul focus:border-azul outline-none transition-all"
+                />
+            </div>
+
+             {/* Invoice Code */}
+            <div>
+                <label className="text-azul font-bold block text-sm mb-1">Código de Factura</label>
+                <input
+                    type="text"
+                    {...register("invoiceCode")}
+                    placeholder="Buscar por código de factura"
                     className="w-full bg-white px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-azul focus:border-azul outline-none transition-all"
                 />
             </div>
@@ -191,7 +205,8 @@ function ManifestCommercialSearchForm({ setFilters }: Props) {
                     item: "",
                     manifestId: "",
                     quotationCode: "",
-                    isInvoiced: ''
+                    isInvoiced: '',
+                    invoiceCode: ''
                 });
                 }}
                 className="bg-red-500 hover:bg-red-600 text-white font-semibold px-4 py-2 rounded-lg transition-all"

@@ -8,6 +8,8 @@ import { useEffect } from "react"
 import TemplatePagination from "./TemplatePagination"
 import TemplateTable from "./TemplateTable"
 import TemplateSearchForm from "./searchTemplate/TemplateSearchForm"
+import { ManifestTableSkeleton } from "../manifiesto-comercial/ManifestTableSkeleton"
+import TemplateTableSkeleton from "./TemplateItemsTableSkeleton"
 
 type DashboadTemplateProps = {
     page: number
@@ -51,9 +53,9 @@ function DashboadTemplate( { page } :  DashboadTemplateProps) {
                 <TemplateSearchForm/>
             </div>
 
-            {isLoading && 
-                <h2 className='text-azul text-xl text-center font-black mt-10'> Cargando Datos...</h2>
-            }
+            {isLoading && (
+                <TemplateTableSkeleton rows={limit} />
+            )}
 
             {!isLoading && data?.templates.length == 0 && (
                 <h2 className="text-azul text-xl text-center font-black mt-10">

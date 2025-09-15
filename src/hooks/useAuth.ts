@@ -18,7 +18,7 @@ export const useAuth = () => {
         queryKey: ['user'],
         queryFn: getUser,
         enabled: !!token,
-        retry: false,
+        retry: 2,
         refetchOnWindowFocus: false 
     })
 

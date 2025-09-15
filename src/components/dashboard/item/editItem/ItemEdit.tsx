@@ -32,7 +32,7 @@ function ItemEdit( { id } : ItemEditProps) {
         categoria: 'OTRO'
     }
 
-    const { register, handleSubmit, formState: {errors}, reset} = useForm({
+    const { register, handleSubmit, formState: {errors}, reset, setValue, watch} = useForm({
         defaultValues: initialValues
     })
 
@@ -88,6 +88,8 @@ function ItemEdit( { id } : ItemEditProps) {
             <ItemForm
                 register={register}
                 errors={errors}
+                watch={watch}
+                setValue={setValue}
             />
 
             <button

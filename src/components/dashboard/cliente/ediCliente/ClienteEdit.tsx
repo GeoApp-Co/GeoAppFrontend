@@ -7,7 +7,6 @@ import Heading from "@/src/UI/Heading"
 import LoaderPage from "@/src/UI/loaders/LoaderPage"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { notFound } from "next/navigation"
-import { useRouter } from "next/router"
 import { useEffect } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "react-toastify"
@@ -28,6 +27,8 @@ function ClienteEdit( { id } : ClienteEditProps) {
 
     const initialValues : NewClientFormType = {
         alias: '',
+        phone1: '',
+        phone2: '',
         email: '',
         identificacion: '',
         name: '',
@@ -67,7 +68,9 @@ function ClienteEdit( { id } : ClienteEditProps) {
                 name: data.name || '',
                 personaType: data.personaType || 'juridica',
                 ubicacion: data.ubicacion || '',
-                identificacionType: data.identificacionType || 'nit'
+                identificacionType: data.identificacionType || 'nit',
+                phone1: data.phone1 || '',
+                phone2: data.phone2 || ''
             })
         }
     }, [data, reset])
