@@ -31,7 +31,7 @@ export default function InvoiceStatusCell({ isInvoiced, manifestItemId, refetch 
 
     return (
         
-        <Stack direction="row" spacing={1} alignItems="center">
+        <Stack direction="row" spacing={1} alignItems="center" justifyContent='space-between'>
             {isInvoiced ? (
             <>
                 <Typography variant="body2" color="success.main">
@@ -41,7 +41,7 @@ export default function InvoiceStatusCell({ isInvoiced, manifestItemId, refetch 
             ) : (
             <>
                 <Typography variant="body2" color="error.main">
-                ----
+                -------
                 </Typography>
             </>
             )}

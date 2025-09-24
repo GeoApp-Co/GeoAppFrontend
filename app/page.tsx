@@ -30,6 +30,18 @@ const navigation = [
     role: ["admin", "factura", 'superAdmin'],
   },
   {
+    url: "/dashboard/manifiesto-disposicion-final",
+    text: "Área de Disposición Final",
+    descripcion: "Administra los items / Disposición Final",
+    role: ["admin", "factura", 'superAdmin', 'disposicionFinal'],
+  },
+  {
+    url: "/dashboard/sitio-disposicion-final",
+    text: "Sitios de Disposición Final",
+    descripcion: "Administra los sitios y licencias de disposición Final",
+    role: ["admin", "factura", 'superAdmin', 'disposicionFinal'],
+  },
+  {
     url: "/dashboard/cliente",
     text: "Clientes",
     descripcion: "Gestiona la información de los clientes",

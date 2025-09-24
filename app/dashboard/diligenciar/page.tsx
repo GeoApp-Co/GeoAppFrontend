@@ -41,7 +41,7 @@ function NewManifestPage() {
             location: '',
             contactClient: '',
             positionClient: '',
-            phone: ''
+            phone: '',
         }
     })
 

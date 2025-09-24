@@ -1,3 +1,5 @@
+import { CertificateFullSchema, manifestFinalDisposalSchema, NpsSchema, paginationManifestCertificateSchema, paginationManifestFinalDisposalSchema, paginationNpsSchema } from "../schemas";
+import { DisposicionFinalLicenciaSchema, DisposicionFinalSchema, DisposicionFinalSitioSchema, responseDisposicionFinalLicenciaSchema, responseDisposicionFinalSchema, responseDisposicionFinalSitioSchema, tratamientosDisposicionFinalEnum } from "../schemas";
 import z from "zod"
 import {  CarSchema, certificateSchema, certificateType, ClienteSchema, itemCategoryEnum, ItemSchema, manifesPreviewtSchema, manifestCertificateSchema, manifestCommercialSchema, manifestInvoiceSchema, ManifestItemSchema, manifestSchema, paginationManifestCommercialSchema, paginationManifestInvoicelSchema, responsePaginationSchema, roles, templateSchema, unidades, userSchema } from "../schemas"
 
@@ -55,12 +57,10 @@ export type ManifestCommerceSearchFormData = {
     quotationCode: string; 
     invoiceCode: string;
     isInvoiced: "" | "true" | "false";
+    hasQuotationCode: "" | "true" | "false";
 };
 
-export type ManifestInvoiceSearchFormData = ManifestCommerceSearchFormData & {
-    invoiceCode: string; 
-
-}
+export type ManifestInvoiceSearchFormData = Pick<ManifestCommerceSearchFormData, 'clientId' | 'fechaMes' | 'manifestTemplate' | 'location' | 'item' | 'manifestId' | 'quotationCode' | 'isInvoiced' | 'invoiceCode' > 
 
 export type ItemCantidad = {
     itemId: number
@@ -88,10 +88,9 @@ export type NewManifestFormType = {
 }
 
 export type NewCertificateType = {
-    manifestIds: number[]
-    No: string
-    clientId: string
-    certificateType: CertificateType
+    code: string;
+    clientId: number;
+    itemIds: { manifestItemId: number }[];
 }
 
 export type UpdateManifestFormType = {
@@ -149,7 +148,7 @@ export type CertificateClientType  = z.infer<typeof certificateSchema>
 //     item
 // };
 
-export type NewClientFormType = Pick<ClienteType, 'alias' | 'email' | 'identificacion' | 'identificacionType' | 'name' | 'ubicacion' | 'direccion' | 'personaType' | 'phone1' | 'phone2' >
+export type NewClientFormType = Pick<ClienteType, 'alias' | 'email' | 'identificacion' | 'identificacionType' | 'name' | 'ubicacion' | 'direccion' | 'personaType' | 'phone1' | 'phone2' | 'contacto' >
 export type NewItemFormType = Pick<ItemType, 'code' | 'name' | 'unidad' | 'categoria' >
 export type NewTemplateFormType = Pick<TemplateType, 'name' > & {
     itemIds: number[]
@@ -160,3 +159,46 @@ export type NewUserFormType = Pick<UserType, 'name' | 'cc' > & {
 }
 
 export type PaginationManifestCommercialType  = z.infer<typeof paginationManifestCommercialSchema>
+export type PaginationManifestCertificateType  = z.infer<typeof paginationManifestCertificateSchema>
+
+export type DisposicionFinalSitioType = z.infer<typeof DisposicionFinalSitioSchema>;
+export type DisposicionFinalLicenciaType = z.infer<typeof DisposicionFinalLicenciaSchema>;
+export type DisposicionFinalType = z.infer<typeof DisposicionFinalSchema>;
+
+export type ResponseDisposicionFinalSitioType = z.infer<typeof responseDisposicionFinalSitioSchema>
+export type ResponseDisposicionFinalLicenciaType = z.infer<typeof responseDisposicionFinalLicenciaSchema>
+export type ResponseDisposicionFinalType = z.infer<typeof responseDisposicionFinalSchema>
+
+export type TratamientosDisposicionFinalType = z.infer<typeof tratamientosDisposicionFinalEnum>
+
+export type LicenciaForm = {
+    licencia: string
+}
+export type SitioForm = {
+    nombre: string
+}
+
+export type ItemDisposicionFinalForm = {
+    manifestItemId: number
+    disposicionFinalId?: number
+    tiquete?: string
+    fechaDisposicionFinal?: string
+    certificadoFinal?: string
+}
+
+export type ManifestFinalDisposalType = z.infer<typeof manifestFinalDisposalSchema>;
+export type ResponseManifestFinalDisposalType = z.infer<typeof paginationManifestFinalDisposalSchema>;
+
+export type DisposicionFinalForm = {
+    sitioId: number
+    licenciaId: number
+    tratamiento: TratamientosDisposicionFinalType
+}
+
+export type CertificateFullType = z.infer<typeof CertificateFullSchema>
+
+export type Unidades = z.infer<typeof unidades>
+
+export type NpsType = z.infer<typeof NpsSchema>;
+export type NpsFormType = Omit<NpsType, 'proximaFecha' | 'id' | 'puntaje'> & { puntaje: number };
+export type PaginationNpsType = z.infer<typeof paginationNpsSchema>;

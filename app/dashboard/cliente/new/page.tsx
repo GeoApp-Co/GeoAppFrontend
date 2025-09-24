@@ -24,7 +24,8 @@ function NewClientePage() {
         direccion: '',
         personaType: 'juridica',
         phone1: '',
-        phone2: ''
+        phone2: '',
+        contacto: ''
     }
 
     const { register, handleSubmit, formState: {errors}, watch} = useForm({

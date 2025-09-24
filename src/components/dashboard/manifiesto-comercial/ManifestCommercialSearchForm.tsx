@@ -16,6 +16,7 @@ type Props = {
 };
 
 function ManifestCommercialSearchForm({ setFilters }: Props) {
+    // ...existing code...
     const { data } = useQuery({
         queryKey: ["templates"],
         queryFn: () => getSelectTemplates({ search: "" }),
@@ -53,6 +54,7 @@ function ManifestCommercialSearchForm({ setFilters }: Props) {
                         : values.isInvoiced === "true"
                         ? 'true'
                         : 'false',
+                hasQuotationCode: values.hasQuotationCode
             };
             setFilters(newFilters);
         }, 2500),
@@ -65,24 +67,12 @@ function ManifestCommercialSearchForm({ setFilters }: Props) {
     }, [formValues, debouncedUpdate]);
 
     return (
-        <Accordion defaultExpanded={false}>
+    <Accordion defaultExpanded={false}>
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
             <Typography className="text-azul font-bold">Filtros de búsqueda</Typography>
         </AccordionSummary>
         <AccordionDetails>
             <form className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Campo: Nombre, alias o identificación */}
-            {/* <div>
-                <label className="text-azul font-bold block text-sm mb-1">
-                Nombre, alias o identificación
-                </label>
-                <input
-                type="text"
-                {...register("nameOrAlias")}
-                placeholder="Nombre, alias o identificación"
-                className="w-full bg-white px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-azul focus:border-azul outline-none transition-all"
-                />
-            </div> */}
 
             <ClientSelectInput
                 setValueCommerce={setValue} 
@@ -97,6 +87,19 @@ function ManifestCommercialSearchForm({ setFilters }: Props) {
                 placeholder="Id, Secuencia del Manifiesto"
                 className="w-full bg-white px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-azul focus:border-azul outline-none transition-all"
                 />
+            </div>
+
+             {/* Filtro: ¿Tiene código de cotización? */}
+            <div>
+                <label className="text-azul font-bold block text-sm mb-1">¿Tiene código de cotización?</label>
+                <select
+                    {...register("hasQuotationCode")}
+                    className="w-full bg-white px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-azul focus:border-azul outline-none transition-all"
+                >
+                    <option value="">Todos</option>
+                    <option value="true">Solo con cotización</option>
+                    <option value="false">Solo sin cotización</option>
+                </select>
             </div>
 
             {/* Quotation Code */}
@@ -206,7 +209,8 @@ function ManifestCommercialSearchForm({ setFilters }: Props) {
                     manifestId: "",
                     quotationCode: "",
                     isInvoiced: '',
-                    invoiceCode: ''
+                    invoiceCode: '',
+                    hasQuotationCode: ''
                 });
                 }}
                 className="bg-red-500 hover:bg-red-600 text-white font-semibold px-4 py-2 rounded-lg transition-all"

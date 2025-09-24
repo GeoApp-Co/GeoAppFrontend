@@ -143,12 +143,27 @@ function TemplateComboBox({ manifestTemplate }: TemplateComboBoxProps) {
 
                 const totalCategoria = items.reduce((acc, item) => {
                     const match = currentItems.find((i) => i.itemId === item.id);
-                    return acc + (match?.cantidad || 0);
+                    let cantidadNum = 0;
+                    const cantidadRaw = match?.cantidad;
+                    if (typeof cantidadRaw === "string") {
+                        const str = (cantidadRaw as string).replace(",", ".");
+                        const num = parseFloat(str);
+                        cantidadNum = isNaN(num) ? 0 : num;
+                    } else if (typeof cantidadRaw === "number") {
+                        cantidadNum = cantidadRaw;
+                    }
+                    return acc + cantidadNum;
                 }, 0);
 
                 // Verificar la CATEGORIA
                 const isServiceCategory = categoria.toLowerCase().includes('servicio');
                 const isSpecialCategory = categoria.toLowerCase() === "especial"; 
+                const totalVolDesechos = isSpecialCategory
+                    ? items.reduce((acc, item) => {
+                        const match = currentItems.find((i) => i.itemId === item.id);
+                        return acc + (match?.volDesechos || 0);
+                    }, 0)
+                    : 0;
                 const isCheckboxItem = (itemName: string) => {
                     return (
                         isServiceCategory ||
@@ -228,12 +243,10 @@ function TemplateComboBox({ manifestTemplate }: TemplateComboBoxProps) {
 
                                                             const validatedQuantity = transformAndValidateQuantity(rawValue);
                                                             if (validatedQuantity !== null) {
-                                                                // Forzar a un decimal
-                                                                const fixedValue = Number(validatedQuantity.toFixed(1));
-                                                                setValue(`cantidad-${m.id}`, fixedValue);
+                                                                setValue(`cantidad-${m.id}`, validatedQuantity);
 
                                                                 const updatedItems = currentItems.map((item) =>
-                                                                    item.itemId === m.id ? { ...item, cantidad: fixedValue } : item
+                                                                    item.itemId === m.id ? { ...item, cantidad: validatedQuantity } : item
                                                                 );
 
                                                                 setValue("items", updatedItems);
@@ -270,11 +283,10 @@ function TemplateComboBox({ manifestTemplate }: TemplateComboBoxProps) {
 
                                                         const validatedValue = transformAndValidateQuantity(rawValue);
                                                         if (validatedValue !== null) {
-                                                        const fixedValue = Number(validatedValue.toFixed(1));
-                                                        setValue(`volDesechos-${m.id}`, fixedValue);
+                                                        setValue(`volDesechos-${m.id}`, validatedValue);
 
                                                         const updatedItems = currentItems.map(item =>
-                                                            item.itemId === m.id ? { ...item, volDesechos: fixedValue } : item
+                                                            item.itemId === m.id ? { ...item, volDesechos: validatedValue } : item
                                                         );
                                                         setValue("items", updatedItems);
                                                         }
@@ -344,11 +356,10 @@ function TemplateComboBox({ manifestTemplate }: TemplateComboBoxProps) {
 
                                                     const validatedValue = transformAndValidateQuantity(rawValue);
                                                     if (validatedValue !== null) {
-                                                    const fixedValue = Number(validatedValue.toFixed(1));
-                                                    setValue(`nHoras-${m.id}`, fixedValue);
+                                                    setValue(`nHoras-${m.id}`, validatedValue);
 
                                                     const updatedItems = currentItems.map(item =>
-                                                        item.itemId === m.id ? { ...item, nHoras: fixedValue } : item
+                                                        item.itemId === m.id ? { ...item, nHoras: validatedValue } : item
                                                     );
                                                     setValue("items", updatedItems);
                                                     }
@@ -367,13 +378,18 @@ function TemplateComboBox({ manifestTemplate }: TemplateComboBoxProps) {
                                 {/* Fila de sumatoria */}
                                 <tr className="bg-gray-100 font-semibold text-azul">
                                     <td></td>
-                                    <td colSpan={ 2} className="p-2">Total - {categoria}</td>
-                                    <td className={`p-2 ${isSpecialCategory ? "text-left" : "text-right"}`}>
-                                    {isServiceCategory
-                                        ? `${totalCategoria} servicios`
-                                        : totalCategoria.toFixed(1)}
+                                    <td colSpan={2} className="p-2">Total - {categoria}</td>
+                                    <td className={`px-4 ${isSpecialCategory ? "text-left" : "text-left"}`}>
+                                        {isServiceCategory
+                                            ? `${totalCategoria} servicios`
+                                            : totalCategoria.toFixed(1)}
                                     </td>
-                                    <td colSpan={isSpecialCategory ? 3 : 0}></td>
+                                    {isSpecialCategory && (
+                                        <td className="p-4   text-left">
+                                            {totalVolDesechos.toFixed(1)}
+                                        </td>
+                                    )}
+                                    <td colSpan={isSpecialCategory ? 2 : 0}></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -386,4 +402,25 @@ function TemplateComboBox({ manifestTemplate }: TemplateComboBoxProps) {
     );
 }
 
-export default TemplateComboBox;
+// Ocultar flechas de los inputs type number
+// Solo afecta a los inputs dentro de este componente
+const inputNumberNoSpinStyles = `
+    input[type=number]::-webkit-inner-spin-button, 
+    input[type=number]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+    input[type=number] {
+        -moz-appearance: textfield;
+    }
+`;
+
+export default function TemplateComboBoxWithNoSpin(props: TemplateComboBoxProps) {
+    return <>
+        <style>{inputNumberNoSpinStyles}</style>
+        <TemplateComboBox {...props} />
+    </>;
+}
+
+// Para mantener compatibilidad con el import por defecto
+export { TemplateComboBoxWithNoSpin as TemplateComboBox };

@@ -35,7 +35,8 @@ function ClienteEdit( { id } : ClienteEditProps) {
         ubicacion: '',
         identificacionType: 'nit',
         direccion: '',
-        personaType: 'juridica'
+        personaType: 'juridica',
+        contacto: ''
     }
 
     const { register, handleSubmit, formState: {errors}, reset, watch} = useForm({
@@ -70,7 +71,8 @@ function ClienteEdit( { id } : ClienteEditProps) {
                 ubicacion: data.ubicacion || '',
                 identificacionType: data.identificacionType || 'nit',
                 phone1: data.phone1 || '',
-                phone2: data.phone2 || ''
+                phone2: data.phone2 || '',
+                contacto: data.contacto || '',
             })
         }
     }, [data, reset])

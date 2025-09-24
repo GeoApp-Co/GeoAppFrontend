@@ -113,8 +113,8 @@ function Row({
                     </Stack>
                 )}
             </TableCell>
-            <TableCell>{row.invoiceCode}
-            </TableCell>
+            <TableCell>{row.quotationCode || '----|'}</TableCell>
+            <TableCell>{row.invoiceCode || '----|'}</TableCell>
         </TableRow>
 
         {/* Fila expandible con items */}
@@ -202,6 +202,7 @@ function ManifestCertificateTable({ manifests, onToggleManifest, onToggleManifes
                 <TableCell sx={headerStyle}>Ubicación</TableCell>
                 <TableCell sx={headerStyle}>Facturado</TableCell>
                 <TableCell sx={headerStyle}>#-Cot</TableCell>
+                <TableCell sx={headerStyle}>#-Fat</TableCell>
                 </TableRow>
             </TableHead>
                 <TableBody>

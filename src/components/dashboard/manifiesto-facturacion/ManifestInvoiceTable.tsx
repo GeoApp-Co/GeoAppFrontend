@@ -163,146 +163,242 @@ function Row({
                     isEdit={row.isEdit}
                     manifestId={row.id}
                     refetch={refetch}
+                    invoiceCode={row.invoiceCode ? true : false}
                 />
             </TableCell>
         </TableRow>
 
-        {/* Fila expandible con items - ADAPTADA AL ESTILO COMMERCIAL CON CATEGORÍAS */}
+        {/* Fila expandible con items - ADAPTADA AL ESTILO COMMERCIAL CON CATEGORÍAS Y CHECKBOX/CAMPOS ESPECIALES */}
         <TableRow
             sx={{
-            backgroundColor: index % 2 === 0 ? "#f3f4f6" : "#ffffff",
+                backgroundColor: index % 2 === 0 ? "#f3f4f6" : "#ffffff",
             }}
         >
             <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={11}>
-            <Collapse in={open} timeout="auto" unmountOnExit>
-                {Object.entries(
-                    row.manifestItems.reduce((acc: Record<string, typeof row.manifestItems>, item) => {
-                        const categoria = item.item.categoria || "Sin categoría";
-                        if (!acc[categoria]) acc[categoria] = [];
-                        acc[categoria].push(item);
-                        return acc;
-                    }, {})
-                ).map(([categoria, items]) => {
-                const totalCategoria = items.reduce((acc, it) => it.isInvoiced ? acc + +it.cantidad : acc , 0);
+                <Collapse in={open} timeout="auto" unmountOnExit>
+                    {Object.entries(
+                        row.manifestItems.reduce((acc: Record<string, typeof row.manifestItems>, item) => {
+                            const categoria = item.item.categoria || "Sin categoría";
+                            if (!acc[categoria]) acc[categoria] = [];
+                            acc[categoria].push(item);
+                            return acc;
+                        }, {})
+                    ).map(([categoria, items]) => {
+                        const isSpecialCategory = categoria.toLowerCase() === "especial";
+                        const isServicio = categoria.toLowerCase() === "servicio";
+                        // Agrupar y sumar por unidad (solo items facturables)
+                        const unidadDefault = {
+                            unidad: 0,
+                            litro: 0,
+                            kg: 0,
+                            hora: 0,
+                            galones: 0,
+                            m3: 0,
+                        };
+                        items.forEach((item) => {
+                            if (!item.isInvoiced) return;
+                            const unidad = item.item.unidad;
+                            const cantidad = parseFloat(item.cantidad) || 0;
+                            if (!unidadDefault[unidad]) unidadDefault[unidad] = 0;
+                            unidadDefault[unidad] += cantidad;
+                        });
 
-                return (
-                    <Box key={categoria} sx={{ marginY: 1,}}>
-                    {/* Nombre de la categoría */}
-                    <h4 
-                    className="text-md text-center font-semibold p-2 bg-azul text-white print:bg-gray-200 print:text-black print:p-1 print:text-xs"
-                    >{categoria}</h4>
+                        return (
+                            <Box key={categoria}>
+                                {/* Nombre de la categoría */}
+                                <h4
+                                    className="text-md text-center font-semibold p-2 bg-azul text-white print:bg-gray-200 print:text-black print:p-1 print:text-xs"
+                                >
+                                    {categoria}
+                                </h4>
 
-                    {/* Tabla de la categoría */}
-                    <Table
-                        size="small"
-                        aria-label={`items-${categoria}`}
-                        sx={{
-                        tableLayout: "fixed",
-                        width: "100%",
-                        border: "1px solid #e5e7eb",
-                        "& th, & td": {
-                            padding: "4px 8px",
-                            fontSize: "0.8rem",
-                        },
-                        }}
-                    >
-                        <TableHead>
-                        <TableRow>
-                            <TableCell sx={{...headerStyle, width: 40 }}>✔</TableCell>
-                            <TableCell sx={{...headerStyle, width: 60 }}>Código</TableCell>
-                            <TableCell sx={{...headerStyle, }}>Nombre</TableCell>
-                            <TableCell sx={{...headerStyle, width: 80 }}>Unidad</TableCell>
-                            <TableCell sx={{...headerStyle, width: 100 }}>¿Se factura?</TableCell>
-                            <TableCell sx={{...headerStyle, width: 80 }} align="right">
-                            Cantidad
-                            </TableCell>
-                        </TableRow>
-                        </TableHead>
+                                {/* Tabla de la categoría */}
+                                <Table
+                                    size="small"
+                                    aria-label={`items-${categoria}`}
+                                    sx={{
+                                        tableLayout: "fixed",
+                                        width: "100%",
+                                        border: "1px solid #e5e7eb",
+                                        "& th, & td": {
+                                            padding: "4px 8px",
+                                            fontSize: "0.8rem",
+                                        },
+                                    }}
+                                >
+                                    <TableHead>
+                                        <TableRow>
+                                            <TableCell sx={{ ...headerStyle, width: 40 }}>✔</TableCell>
+                                            <TableCell sx={{ ...headerStyle, width: 70 }}>Código</TableCell>
+                                            <TableCell sx={{ ...headerStyle }}>Nombre</TableCell>
+                                            <TableCell sx={{ ...headerStyle, width: 80 }}>Unidad</TableCell>
+                                            {isSpecialCategory && (
+                                                <>
+                                                    <TableCell sx={{ ...headerStyle, width: 100 }}>Vol. Desechos</TableCell>
+                                                    <TableCell sx={{ ...headerStyle, width: 80 }}># Viajes</TableCell>
+                                                    <TableCell sx={{ ...headerStyle, width: 80 }}># Minutos</TableCell>
+                                                </>
+                                            )}
+                                            <TableCell sx={{ ...headerStyle, width: 80 }} align="right">
+                                                {isServicio ? "" : "Cantidad"}
+                                            </TableCell>
+                                            <TableCell sx={{ ...headerStyle, width: 100 }}>¿Se factura?</TableCell>
+                                        </TableRow>
+                                    </TableHead>
 
-                        <TableBody>
-                        {items.map((item, idx) => (
-                            <TableRow
-                            key={item.id}
-                            sx={{
-                                backgroundColor: idx % 2 === 0 ? "#fdfdfd" : "#f5f5f5",
-                            }}
-                            >
-                            {/* ✔ fijo */}
-                            <TableCell sx={{ width: 40 }} padding="checkbox">
-                                <Checkbox
-                                disabled={!item.isInvoiced}
-                                checked={
-                                    manifestSelected?.items.some((i) => (i.id === item.item.id) && (i.isVoiced)) ??
-                                    false
-                                }
-                                onChange={() =>
-                                    onToggleItem(row.id, {
-                                        id: item.item.id,
-                                        cantidad: +item.cantidad,
-                                        isVoiced: item.isInvoiced, // ✅ Usar isInvoiced como isVoiced
-                                        categoria: item.item.categoria
-                                    })
-                                }
-                                />
-                            </TableCell>
+                                    <TableBody>
+                                        {items.map((item, idx) => {
+                                            // Para checkbox de cantidad en servicio o aromatizante
+                                            const isAromatizante =
+                                                isServicio || item.item.name.toLowerCase().includes("aromatizante");
+                                            return (
+                                                <TableRow
+                                                    key={item.id}
+                                                    sx={{
+                                                    backgroundColor: idx % 2 === 0 ? "#b0b3b8" : "#d1d5db", // gris más oscuro y gris medio
+                                                    "& th, & td": {
+                                                        padding: "4px 8px", // igual que invoice, filas delgadas
+                                                        fontSize: "0.8rem",
+                                                    },
+                                                    height: 40, // fuerza altura mínima
+                                                }}
+                                                >
+                                                    {/* ✔ fijo */}
+                                                    <TableCell sx={{ width: 40 }} padding="checkbox">
+                                                        <Checkbox
+                                                            disabled={!item.isInvoiced}
+                                                            checked={
+                                                                manifestSelected?.items.some((i) => (i.id === item.item.id) && (i.isVoiced)) ??
+                                                                false
+                                                            }
+                                                            onChange={() =>
+                                                                onToggleItem(row.id, {
+                                                                    id: item.item.id,
+                                                                    cantidad: +item.cantidad,
+                                                                    isVoiced: item.isInvoiced,
+                                                                    categoria: item.item.categoria
+                                                                })
+                                                            }
+                                                        />
+                                                    </TableCell>
 
-                            {/* Código */}
-                            <TableCell sx={{ width: 60 }}>{item.item.code}</TableCell>
+                                                    {/* Código */}
+                                                    <TableCell sx={{ width: 60 }}>{item.item.code}</TableCell>
 
-                            {/* Nombre */}
-                            <TableCell
-                                sx={{
-                                whiteSpace: "normal",
-                                wordBreak: "break-word",
-                                }}
-                            >
-                                {item.item.name}
-                            </TableCell>
+                                                    {/* Nombre */}
+                                                    <TableCell
+                                                        sx={{
+                                                            whiteSpace: "normal",
+                                                            wordBreak: "break-word",
+                                                        }}
+                                                    >
+                                                        <span className="uppercase">{item.item.name}</span>
+                                                    </TableCell>
 
-                            {/* Unidad */}
-                            <TableCell sx={{ width: 80 }}>
-                                {translateMedidasSimbolos(item.item.unidad)}
-                            </TableCell>
+                                                    {/* Unidad */}
+                                                    <TableCell sx={{ width: 80 }}>
+                                                        {translateMedidasSimbolos(item.item.unidad)}
+                                                    </TableCell>
 
-                            {/* Factura */}
-                            <TableCell sx={{ width: 100 }}>
-                                {item.isInvoiced ? (
-                                    <Typography variant="body2" color="success.main">
-                                    Facturar
-                                    </Typography>
-                                ) : (
-                                    <Typography variant="body2" color="error.main">
-                                    ----
-                                    </Typography>
-                                )}
-                            </TableCell>
+                                                     {/* Cantidad o checkbox para servicio/aromatizante */}
+                                                    <TableCell align="center" sx={{ width: 80 }}>
+                                                        {isServicio ? (
+                                                            <Checkbox
+                                                                checked={parseFloat(item.cantidad) > 0}
+                                                                disabled
+                                                                size="small"
+                                                                sx={{
+                                                                    color: "#0054a6",
+                                                                    "&.Mui-checked": {
+                                                                        color: "#0054a6",
+                                                                    },
+                                                                }}
+                                                            />
+                                                        ) : isAromatizante ? (
+                                                            <Checkbox
+                                                                checked={parseFloat(item.cantidad) > 0}
+                                                                disabled
+                                                                size="small"
+                                                                sx={{
+                                                                    color: "#0054a6",
+                                                                    "&.Mui-checked": {
+                                                                        color: "#0054a6",
+                                                                    },
+                                                                }}
+                                                            />
+                                                        ) : (
+                                                            <span>
+                                                                {parseFloat(item.cantidad) === 0 ? "----" : item.cantidad}
+                                                            </span>
+                                                        )}
+                                                    </TableCell>
 
-                            {/* Cantidad */}
-                            <TableCell align="right" sx={{ width: 80 }}>
-                                {item.cantidad}
-                            </TableCell>
-                            </TableRow>
-                        ))}
+                                                    {/* Volumen, viajes, horas para especial */}
+                                                    {isSpecialCategory && (
+                                                        <>
+                                                            <TableCell sx={{ width: 100 }} align="right">
+                                                                {parseFloat(item.volDesechos || "0") === 0
+                                                                    ? "----"
+                                                                    : parseFloat(item.volDesechos || "0").toFixed(1)}
+                                                            </TableCell>
+                                                            <TableCell sx={{ width: 80 }} align="right">{item.nViajes || "----"}</TableCell>
+                                                            <TableCell sx={{ width: 80 }} align="right">
+                                                                {parseFloat(item.nHoras || "0") === 0
+                                                                    ? "----"
+                                                                    : parseFloat(item.nHoras || "0").toFixed(1)}
+                                                            </TableCell>
+                                                        </>
+                                                    )}
 
-                        {/* Total de la categoría */}
-                        <TableRow
-                            sx={{
-                            backgroundColor: "#f3f4f6",
-                            fontWeight: "bold",
-                            }}
-                        >
-                            <TableCell colSpan={5} align="right">
-                            Total - {categoria}
-                            </TableCell>
-                            <TableCell align="right">{totalCategoria.toFixed(1)}</TableCell>
-                        </TableRow>
-                        </TableBody>
-                    </Table>
-                    </Box>
-                );
-                })}
+                                                    {/* Factura */}
+                                                    <TableCell sx={{ width: 100 }}>
+                                                        {item.isInvoiced ? (
+                                                            <Typography variant="body2" color="success.main">
+                                                                Facturar
+                                                            </Typography>
+                                                        ) : (
+                                                            <Typography variant="body2" color="error.main">
+                                                                ----
+                                                            </Typography>
+                                                        )}
+                                                    </TableCell>
+                                                </TableRow>
+                                            );
+                                        })}
 
-            </Collapse>
+                                        {/* Totales por unidad: una fila por cada unidad con cantidad > 0 */}
+                                        {(Object.keys(unidadDefault) as (keyof typeof unidadDefault)[])
+                                            .filter((unidad) => unidadDefault[unidad] > 0)
+                                            .map((unidad, idx, arr) => (
+                                                <TableRow
+                                                    key={unidad}
+                                                    sx={{
+                                                        backgroundColor: "#f3f4f6",
+                                                        fontWeight: "bold",
+                                                    }}
+                                                >
+                                                    <TableCell colSpan={3}></TableCell>
+                                                    <TableCell colSpan={isSpecialCategory ? 1 : 1} align="center">
+                                                        {translateMedidasSimbolos(unidad)} - Total
+                                                    </TableCell>
+                                                    <TableCell align="center">
+                                                        <span className="text-azul">{unidadDefault[unidad].toFixed(1)} </span>
+                                                    </TableCell>
+                                                    {isSpecialCategory && idx === 0 && (
+                                                        <TableCell align="right" rowSpan={arr.length}>
+                                                            <span className="text-azul">
+                                                                {items.reduce((acc, it) => acc + (parseFloat(it.volDesechos || "0") || 0), 0).toFixed(1)}
+                                                            </span>
+                                                        </TableCell>
+                                                    )}
+                                                </TableRow>
+                                            ))}
+                                    </TableBody>
+                                </Table>
+                            </Box>
+                        );
+                    })}
+                </Collapse>
             </TableCell>
         </TableRow>
         </React.Fragment>
@@ -327,7 +423,7 @@ function ManifestInvoiceTable({
             stickyHeader
             sx={{
             "& th, & td": {
-                padding: "4px 8px", // 👈 compacto como commercial
+                padding: "4px 8px",
                 fontSize: "0.8rem", 
             },
             }}

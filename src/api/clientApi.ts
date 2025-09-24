@@ -1,7 +1,6 @@
-
 import { isAxiosError } from "axios";
 import api from "../config/axios";
-import { ClienteSchema, paginationClientesSchema } from "../schemas";
+import { ClienteSchema, paginationClientesSchema, plantillasClienteSchema } from "../schemas";
 import { NewClientFormType } from "../types";
 
 type ClientType = {
@@ -87,5 +86,21 @@ export async function updateClient( { formData, clienteId } : Pick<ClientType, '
             console.log(error);
             throw new Error(error.response.data.error);
         }
+    }
+}
+
+export async function getPlantillasByCliente({ clienteId }: Pick<ClientType, 'clienteId'>) {
+    try {
+        const url = `/clientes/${clienteId}/plantillas`;
+        const { data } = await api.get(url);
+        // Se espera un array de plantillas con id y name
+        const response = plantillasClienteSchema.safeParse(data)
+        if (response.success) return response.data;
+    } catch (error) {
+        if (isAxiosError(error) && error.response) {
+            console.log(error);
+            throw new Error(error.response.data.error);
+        }
+        throw error;
     }
 }

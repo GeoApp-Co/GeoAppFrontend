@@ -122,6 +122,8 @@ export const traslateRoles = (rolName: string): string => {
                 return 'Facturación';
             case 'operacion':
                 return 'Operaciones';
+            case 'disposicionFinal':
+                return 'Disposición Final';
             default:
                 return `Rol desconocido (${role})`;
         }

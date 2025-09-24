@@ -1,9 +1,10 @@
 "use client";
-import { GroupedItems, ManifestByIdType } from "@/src/types";
+import { GroupedItems, ManifestByIdType, Unidades } from "@/src/types";
 import {
     formatDateTimeLarge,
     formatNumber,
     translateMedidasSimbolos,
+    traslateRoles,
 } from "@/src/utils";
 import { Checkbox } from "@mui/material";
 import Image from "next/image";
@@ -162,105 +163,145 @@ function ManifiestViewById({ manifest }: ManifiestViewByIdProps) {
                 {manifest.manifestTemplate.name}
             </h3>
             {Object.entries(groupedItems).map(([categoria, items]) => {
-            const isSpecialCategory = categoria.toLowerCase() === "especial";
-            const totalCategoria = items.reduce((acc, item) => acc + +item.cantidad, 0);
+                const isSpecialCategory = categoria.toLowerCase() === "especial";
+                const isServicio = categoria.toLowerCase() === "servicio";
 
-            return (
-                <div key={categoria} className="mb-6 print:mb-2 print-break-inside-avoid">
-                <h4
-                    className="text-md text-center font-semibold p-2 bg-azul text-white print:bg-gray-200 print:text-black print:p-1 print:text-xs"
-                >
-                    {categoria}
-                </h4>
-                <table
-                    className="w-full text-sm text-left border border-gray-300 rounded-md print:text-[10px] print:border-black"
-                >
-                    <thead>
-                    <tr className="bg-azul text-white text-sm print:bg-gray-200 print:text-black print:text-[10px]">
-                        <th className="p-1 w-20">Código</th>
-                        <th className="p-1">Nombre</th>
-                        <th className="p-1 text-right w-20">Unidad</th>
-                        <th className="p-1 text-right w-20">Cantidad</th>
-                        {isSpecialCategory && (
-                        <>
-                            <th className="p-1 text-right w-32">Vol. Desechos</th>
-                            <th className="p-1 text-right w-20"># Viajes</th>
-                            <th className="p-1 text-right w-20"># Horas</th>
-                        </>
-                        )}
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {items.map((m) => {
-                        const isAromatizante =
-                            categoria.toLowerCase().includes("servicio") ||
-                            m.item.name.toLowerCase().includes("aromatizante");
+                // Agrupar y sumar por unidad
+                const unidadDefault: Record<Unidades, number> = {
+                    unidad: 0,
+                    litro: 0,
+                    kg: 0,
+                    hora: 0,
+                    galones: 0,
+                    m3: 0,
+                };
+                items.forEach((item) => {
+                    const unidad : Unidades = item.item.unidad;
+                    const cantidad = parseFloat(item.cantidad) || 0;
+                    if (!unidadDefault[unidad]) unidadDefault[unidad] = 0;
+                    unidadDefault[unidad] += cantidad;
+                });
 
-                        return (
-                            <tr
-                                key={m.id}
-                                className="border-b hover:bg-blue-100 print:hover:bg-transparent print:border-black"
-                            >
-                                <td className="p-1 w-20">{m.item.code}</td>
-                                <td className="p-1">{m.item.name}</td>
-                                <td className="p-1 text-right w-20">
-                                    {translateMedidasSimbolos(m.item.unidad)}
-                                </td>
-                                <td className="p-1 text-center w-20">
-                                    {isAromatizante ? (
-                                        <Checkbox
-                                            checked={parseFloat(m.cantidad) > 0}
-                                            disabled
-                                            size="small"
-                                            sx={{
-                                                color: "#0054a6",
-                                                "&.Mui-checked": {
-                                                    color: "#0054a6",
-                                                },
-                                            }}
-                                        />
-                                    ) : (
-                                        <span>
-                                            {parseFloat(m.cantidad) === 0 ? "----" : m.cantidad}
-                                        </span>
+                return (
+                    <div key={categoria} className="mb-6 print:mb-2">
+                        <h4
+                            className="text-md text-center font-semibold p-2 bg-azul text-white print:bg-gray-200 print:text-black print:p-1 print:text-xs"
+                        >
+                            {categoria}
+                        </h4>
+                        <table
+                            className="w-full text-sm text-left border border-gray-300 rounded-md print:text-[10px] print:border-black"
+                        >
+                            <thead>
+                                <tr className="bg-azul text-white text-sm print:bg-gray-200 print:text-black print:text-[10px]">
+                                    <th className="p-1 w-20">Código</th>
+                                    <th className="p-1">Nombre</th>
+                                    <th className="p-1 text-right w-20">Unidad</th>
+                                    <th className="p-1 text-right w-24">Cantidad</th>
+                                    {isSpecialCategory && (
+                                        <>
+                                            <th className="p-1 text-right w-32">Vol. Desechos</th>
+                                            <th className="p-1 text-right w-20"># Viajes</th>
+                                            <th className="p-1 text-right w-20"># Minutos</th>
+                                        </>
                                     )}
-                                </td>
-                                {isSpecialCategory && (
-                                    <>
-                                        <td className="p-1 text-right w-24">
-                                            {parseFloat(m.volDesechos || "0") === 0
-                                                ? "----"
-                                                : parseFloat(m.volDesechos || "0").toFixed(1)}
-                                        </td>
-                                        <td className="p-1 text-right w-20">{m.nViajes || 0}</td>
-                                        <td className="p-1 text-right w-20">
-                                            {parseFloat(m.nHoras || "0") === 0
-                                                ? "----"
-                                                : parseFloat(m.nHoras || "0").toFixed(1)}
-                                        </td>
-                                    </>
-                                )}
-                            </tr>
-                        );
-                    })}
-                    <tr
-                        className="bg-gray-100 font-semibold text-azul print:bg-gray-200 print:text-black"
-                    >
-                        <td></td>
-                        <td colSpan={2} className="p-1">
-                        Total - {categoria}
-                        </td>
-                        <td className="p-1 text-right">{totalCategoria.toFixed(1)}</td>
-                        {isSpecialCategory && (
-                        <>
-                            <td colSpan={3}></td>
-                        </>
-                        )}
-                    </tr>
-                    </tbody>
-                </table>
-                </div>
-            );
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {items.map((m) => {
+                                    const isAromatizante =
+                                        categoria.toLowerCase().includes("servicio") ||
+                                        m.item.name.toLowerCase().includes("aromatizante");
+
+                                    return (
+                                        <tr
+                                            key={m.id}
+                                            className="border-b hover:bg-blue-100 print:hover:bg-transparent print:border-black print-break-inside-avoid"
+                                        >
+                                            <td className="p-1 w-20">{m.item.code}</td>
+                                            <td className="p-1">{m.item.name}</td>
+                                            <td className="p-1 text-right w-20">
+                                                {translateMedidasSimbolos(m.item.unidad)}
+                                            </td>
+                                            <td className="p-1 text-center w-20">
+                                                {isServicio ? (
+                                                    <Checkbox
+                                                        checked={parseFloat(m.cantidad) > 0}
+                                                        disabled
+                                                        size="small"
+                                                        sx={{
+                                                            color: "#0054a6",
+                                                            "&.Mui-checked": {
+                                                                color: "#0054a6",
+                                                            },
+                                                        }}
+                                                    />
+                                                ) : isAromatizante ? (
+                                                    <Checkbox
+                                                        checked={parseFloat(m.cantidad) > 0}
+                                                        disabled
+                                                        size="small"
+                                                        sx={{
+                                                            color: "#0054a6",
+                                                            "&.Mui-checked": {
+                                                                color: "#0054a6",
+                                                            },
+                                                        }}
+                                                    />
+                                                ) : (
+                                                    <span>
+                                                        {parseFloat(m.cantidad) === 0 ? "----" : m.cantidad}
+                                                    </span>
+                                                )}
+                                            </td>
+                                            {isSpecialCategory && (
+                                                <>
+                                                    <td className="p-1 text-right w-24">
+                                                        {parseFloat(m.volDesechos || "0") === 0
+                                                            ? "----"
+                                                            : parseFloat(m.volDesechos || "0").toFixed(1)}
+                                                    </td>
+                                                    <td className="p-1 text-right w-20">{m.nViajes || 0}</td>
+                                                    <td className="p-1 text-right w-20">
+                                                        {parseFloat(m.nHoras || "0") === 0
+                                                            ? "----"
+                                                            : parseFloat(m.nHoras || "0").toFixed(1)}
+                                                    </td>
+                                                </>
+                                            )}
+                                        </tr>
+                                    );
+                                })}
+                                {/* Totales por unidad: una fila por cada unidad con cantidad > 0 */}
+                                {(Object.keys(unidadDefault) as Unidades[])
+                                    .filter((unidad) => unidadDefault[unidad] > 0)
+                                    .map((unidad, idx) => (
+                                        <tr
+                                            key={unidad}
+                                            className="bg-gray-100 font-semibold text-azul print:bg-gray-200 print:text-black"
+                                        >
+                                            <td></td>
+                                            <td colSpan={2} className="p-1 text-right">
+                                                Total - {translateMedidasSimbolos(unidad)}
+                                            </td>
+                                            <td className="p-1 text-center">
+                                                {unidadDefault[unidad].toFixed(1)} 
+                                            </td>
+                                            {isSpecialCategory && idx === 0 && (
+                                                <>
+                                                <td className="text-right">
+                                                    {items.reduce((sum, m) => sum + (parseFloat(m.volDesechos || "0") || 0), 0).toFixed(1)}
+                                                </td>
+                                                <td colSpan={2}></td>
+                                                </>
+                                                
+                                            )}
+                                        </tr>
+                                    ))}
+                            </tbody>
+                        </table>
+                    </div>
+                );
             })}
 
 
@@ -289,13 +330,10 @@ function ManifiestViewById({ manifest }: ManifiestViewByIdProps) {
             </div>
 
             {/* Firmas */}
-            <h3
-            className="text-lg font-semibold text-azul mb-2 print:text-sm print:mb-1"
-            >
-            Firmas
-            </h3>
+            <div>
+            <h3 className="text-lg font-semibold text-azul mb-2 print:text-sm print:mb-1 print-break-inside-avoid"> Firmas </h3>
             <table
-                className="w-full border border-gray-300 text-sm text-gray-700 print:text-[10px] print:border-black print-break-inside-avoid"
+                className="w-full border border-gray-300 text-sm text-gray-700 print:text-[10px] print:border-black "
             >
             <tbody>
                 <tr>
@@ -321,12 +359,20 @@ function ManifiestViewById({ manifest }: ManifiestViewByIdProps) {
                         <table className="w-full border border-gray-300 text-sm text-gray-700 mt-2 print:text-[10px] print:border-black">
                         <tbody>
                             <tr>
-                            <td className="p-1 font-semibold border w-40 bg-gray-100">
-                                Nombre
-                            </td>
-                            <td className="p-1 border">
-                                {manifest.user?.name || "No registrado"}
-                            </td>
+                                <td className="p-1 font-semibold border w-40 bg-gray-100">
+                                    Nombre
+                                </td>
+                                <td className="p-1 border">
+                                    {manifest.user?.name || "No registrado"}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td className="p-1 font-semibold border w-40 bg-gray-100">
+                                    Rol
+                                </td>
+                                <td className="p-1 border">
+                                    {manifest.user?.rol?.name ? traslateRoles(manifest.user.rol.name) : "No registrado"}
+                                </td>
                             </tr>
                         </tbody>
                         </table>
@@ -378,6 +424,8 @@ function ManifiestViewById({ manifest }: ManifiestViewByIdProps) {
                 </tr>
             </tbody>
             </table>
+
+            </div>
         </div>
     );
 }

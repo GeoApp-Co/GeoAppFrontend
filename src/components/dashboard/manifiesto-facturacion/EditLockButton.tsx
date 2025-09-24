@@ -12,9 +12,10 @@ type EditLockButtonProps = {
   isEdit: boolean;
   manifestId: number
     refetch: (options?: RefetchOptions | undefined) => Promise<QueryObserverResult<ResponseManifestInvoiceType | undefined, Error>>
+    invoiceCode: boolean
 };
 
-export default function EditLockButton({ isEdit, manifestId, refetch}: EditLockButtonProps) {
+export default function EditLockButton({ isEdit, manifestId, refetch, invoiceCode }: EditLockButtonProps) {
 
   const { mutate, isPending} = useMutation({
     mutationFn: changeIsEditManifest,
@@ -37,7 +38,7 @@ export default function EditLockButton({ isEdit, manifestId, refetch}: EditLockB
     <Tooltip title={isEdit ? "Modo Edición (Desbloqueado)" : "Modo Lectura (Bloqueado)"}>
       <IconButton 
         onClick={ () => handleChangeIsEditManifest(manifestId)}
-        disabled={isPending}
+        disabled={isPending || !invoiceCode}
         sx={{
           color: isEdit ? "green" : "red",
           transition: "0.3s ease",

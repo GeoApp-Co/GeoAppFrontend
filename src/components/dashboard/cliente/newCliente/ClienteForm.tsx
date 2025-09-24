@@ -42,6 +42,20 @@ function ClienteForm({ errors, register, watch }: ClienteFormProps) {
                 {errors.alias && <ErrorMessage>{errors.alias.message}</ErrorMessage>}
             </div>
 
+            {/* Contacto */}
+            <div>
+                <label className="text-azul font-bold block text-sm mb-1">Contacto</label>
+                <input
+                    type="text"
+                    {...register("contacto", {
+                        required: "El contacto es obligatorio",
+                    })}
+                    className="w-full bg-white px-4 py-2 border border-gray-300 rounded-lg"
+                    placeholder="Nombre del contacto principal"
+                />
+                {errors.contacto && <ErrorMessage>{errors.contacto.message}</ErrorMessage>}
+            </div>
+
             {/* Tipo de identificación */}
             <div>
                 <label className="text-azul font-bold block text-sm mb-1">Tipo de identificación</label>

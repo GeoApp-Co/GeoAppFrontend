@@ -43,7 +43,8 @@ function DashboardCommercialManifesto({ page }: DashboardCommercialManifestoProp
         manifestTemplate: '',
         quotationCode: '',
         isInvoiced: '',
-        invoiceCode: ''
+        invoiceCode: '',
+        hasQuotationCode: ''
     })
 
     const [selected, setSelected] = useState<selectedManifest[]>([]);

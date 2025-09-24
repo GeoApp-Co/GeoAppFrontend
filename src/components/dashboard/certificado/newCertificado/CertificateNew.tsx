@@ -1,170 +1,93 @@
 "use client";
-import { getCertificateManifest } from "@/src/api/manifestApi";
-import { QueryObserverResult, RefetchOptions, useMutation, useQuery } from "@tanstack/react-query";
-import debounce from "lodash.debounce";
-import { useMemo, useState, useEffect } from "react";
+import {
+    ManifestInvoiceSearchFormData,
+    PaginationManifestCertificateType,
+} from "@/src/types";
+import {
+    formatDateTimeLarge,
+    formatNumber,
+    translateMedidasSimbolos,
+} from "@/src/utils";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import {
     Accordion,
-    AccordionSummary,
     AccordionDetails,
+    AccordionSummary,
+    Box,
+    Checkbox,
+    Collapse,
+    IconButton,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TablePagination,
+    TableRow,
     Typography,
-    Button,
 } from "@mui/material";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-
-import CertificateFormSearch from "../CertificateFormSearch";
-import ManifestCertificatePagination from "../ManifestCertificatePagination";
-import ManifestCertificateTable from "../ManifestCertificateTable";
-import CertificateNewForm from "./CertificateNewForm";
-import { useForm } from "react-hook-form";
-import { NewCertificateType } from "@/src/types";
-
-import SaveIcon from "@mui/icons-material/Save";
-import { toast } from "react-toastify"; // 👈 asegúrate de tener react-toastify instalado
+import React, { Dispatch, SetStateAction, useState } from "react";
+import { headerStyle } from "../../manifiesto-comercial/ManifestCommercialTable";
+import ManifestInvoiceSearchForm from "../../manifiesto-facturacion/ManifestInvoiceSearchForm";
+import { SelectedManifestItems } from "../DashboardCertificate";
+import { useMutation } from "@tanstack/react-query";
 import { createCertificate } from "@/src/api/certificateApi";
+import { toast } from "react-toastify";
+import dayjs from "dayjs";
+import { useRouter } from "next/navigation";
 
 export type selectedManifestCertificate = {
     id: number;
 };
 
-type CertificateNewProps = {
+interface CertificateNewProps {
+    data: PaginationManifestCertificateType | undefined;
+    isLoading: boolean;
+    setFilters: Dispatch<SetStateAction<ManifestInvoiceSearchFormData>>;
+    selectedState: SelectedManifestItems;
+    selectItem: (manifestItemId: number) => void;
     page: number;
-    refetch: (options?: RefetchOptions | undefined) => Promise<QueryObserverResult<{
-    total: number;
-    totalPages: number;
-    currentPage: number;
-    certificates: {
-        No: string;
-        certificateType: "CERTIFICADO DE GESTIÓN INTEGRAL DE RESIDUOS";
-        id: number;
-        createdAt: string;
-        cliente: {
-            id: number;
-            identificacionType: "cc" | "ti" | "ce" | "nit" | "rc" | "pa" | "pep" | "diplomatico" | "sinIdentificacion";
-            name: string;
-            alias: string;
-            identificacion: string;
-        };
-    }[];
-} | undefined, Error>>
-};
+    limit: number;
+    onChangePage: (event: unknown, newPage: number) => void;
+    onChangeRowsPerPage: (event: React.ChangeEvent<HTMLInputElement>) => void;
+}
 
-function CertificateNew({ page, refetch}: CertificateNewProps) {
-    const limit = 10;
+function CertificateNew({ data, isLoading, setFilters, selectedState, selectItem, page, limit, onChangePage, onChangeRowsPerPage }: CertificateNewProps) {
 
-    const [code, setCode] = useState<string>("");
-    const [clientId, setClientId] = useState<string>(""); 
-    const [selected, setSelected] = useState<selectedManifestCertificate[]>([]);
+    const router = useRouter()
 
-    const initialValues: NewCertificateType = {
-        certificateType: "CERTIFICADO DE GESTIÓN INTEGRAL DE RESIDUOS",
-        clientId: "",
-        manifestIds: [],
-        No: "",
-    };
+    function generateCertificateCode() {
+        const random = Math.floor(10000 + Math.random() * 90000); // 5 cifras
+        const date = dayjs().format("YYYYMMDD");
+        return `${random}-${date}`;
+    }
 
-    const {
-        register,
-        formState: { errors },
-        setValue,
-        handleSubmit,
-        reset
-    } = useForm<NewCertificateType>({
-        defaultValues: initialValues,
+    const { mutate, isPending} = useMutation({
+        mutationFn: createCertificate,
+        onError: (error) => {
+            toast.error(error.message || "Error al crear certificado");
+        },
+        onSuccess: (data) => {
+            // Aquí puedes mostrar un mensaje, limpiar selección, etc.
+            toast.success("Certificado creado con éxito");
+            router.push(`/dashboard/certificado/${data}/view`) // Redirigir al nuevo certificado
+        },
     });
 
+    const handleCreateCertificate = () => {
 
-    useEffect(() => {
-        setValue("clientId", clientId);
-    }, [clientId, setValue]);
+        const code = generateCertificateCode();
 
-    useEffect(() => {
-        setValue(
-            "manifestIds",
-            selected.map((s) => s.id)
-        );
-    }, [selected, setValue]);
-
-    const { mutate, isPending } = useMutation({
-        mutationFn: createCertificate,
-        onError(error) {
-            toast.error(error.message)
-        },
-        onSuccess(data) {
-            toast.success('Certificado creado correcatmente')
-             // 👇 reiniciar todo
-            setSelected([]);
-            setClientId("");
-            setCode("");
-            reset(initialValues);
-            refetch()
-        }
-    })
-
-    const handleCreateCertificate = (formData: NewCertificateType) => {
-
-        if (!formData.clientId) {
-            toast.error("Debe seleccionar un cliente.");
-            return;
-        }
-        if (!formData.manifestIds || formData.manifestIds.length === 0) {
-            toast.error("Debe seleccionar al menos un manifiesto.");
-            return;
-        }
-        if (!formData.No) {
-            toast.error("Debe ingresa el Número de Certificado.");
-            return;
-        }
-        if (!formData.certificateType) {
-            toast.error("Debe seleccionar el tipod de certifizado.");
-            return;
+        const formData = {
+            code,
+            clientId: selectedState.clientId,
+            itemIds: selectedState.itemIds
         }
 
         mutate({formData})
-    };
-
-    const handleToggleManifest = (manifestId: number) => {
-        setSelected((prev) => {
-            const manifestIndex = prev.findIndex((m) => m.id === manifestId);
-
-            if (manifestIndex === -1) {
-                return [...prev, { id: manifestId }];
-            }
-            return prev.filter((m) => m.id !== manifestId);
-        });
-    };
-
-    const handleToggleManifests = (manifestIds: number[]) => {
-        setSelected((prev) => {
-            const allSelected = manifestIds.every((id) =>
-                prev.some((m) => m.id === id)
-            );
-
-            if (allSelected) {
-                return prev.filter((m) => !manifestIds.includes(m.id));
-            } else {
-                const toAdd = manifestIds
-                    .filter((id) => !prev.some((m) => m.id === id))
-                    .map((id) => ({ id }));
-
-                return [...prev, ...toAdd];
-            }
-        });
-    };
-
-    const debouncedSetCode = useMemo(
-        () =>
-            debounce((value: string) => {
-                setCode(value);
-            }, 1500),
-        []
-    );
-
-    const { data, isLoading } = useQuery({
-        queryKey: ["manifestCertificate", page, limit, code, clientId],
-        queryFn: () => getCertificateManifest({ code, clientId, limit, page }),
-        enabled: !!code && !!clientId,
-    });
+    }
 
     return (
         <Accordion defaultExpanded={false}>
@@ -172,33 +95,36 @@ function CertificateNew({ page, refetch}: CertificateNewProps) {
                 <p className="font-bold text-azul text-lg">Nuevo Certificado</p>
             </AccordionSummary>
 
-            <AccordionDetails>
+            <AccordionDetails sx={{ backgroundColor: "#f0f6ff" }}>
                 <div className="mb-4 p-3 bg-gray-50 border border-gray-200 rounded-lg">
-                    <Typography
-                        variant="body1"
-                        className="text-gray-700 leading-relaxed"
-                    >
+                    <Typography variant="body1" className="text-gray-700 leading-relaxed">
                         Busca{" "}
                         <span className="font-semibold text-azul">
                             servicios o manifiestos
-                        </span>{" "}
-                        filtrando por{" "}
-                        <span className="font-semibold">cliente</span> y/o{" "}
-                        <span className="font-semibold">
-                            código de facturación
-                        </span>
-                        . Agrúpalos y selecciona el tipo de certificado que
-                        deseas generar.
+                        </span> empieza buscando por Cliente.
                     </Typography>
                 </div>
 
-                <div className="grid grid-cols-1 gap-3 mb-3">
-                    <CertificateFormSearch
-                        onSearchChange={debouncedSetCode}
-                        clientId={clientId}
-                        setClientId={setClientId}
-                    />
+                <div className="grid grid-cols-1 gap-3 my-5 ">
+                    <ManifestInvoiceSearchForm setFilters={setFilters} />
                 </div>
+
+                {/* Botón Crear Certificado y contador de seleccionados */}
+                {selectedState.itemIds.length > 0 && (
+                    <div className="flex justify-between items-center gap-4 mb-4 w-full">
+                        <button
+                            className="bg-azul w-[80%] text-white px-4 py-2 rounded font-semibold shadow hover:bg-blue-800 transition"
+                            type="button"
+                            onClick={handleCreateCertificate}
+                            disabled={isPending}
+                        >
+                            {isPending ? "Creando..." : "Crear Certificado"}
+                        </button>
+                        <span className="text-azul font-bold">
+                            {selectedState.itemIds.length} item(s) seleccionado(s)
+                        </span>
+                    </div>
+                )}
 
                 {isLoading && (
                     <h2 className="text-azul text-xl text-center font-black mt-10">
@@ -206,54 +132,307 @@ function CertificateNew({ page, refetch}: CertificateNewProps) {
                     </h2>
                 )}
 
-                {!isLoading && data?.manifests.length === 0 && (
+                {data?.manifests.length === 0 && (
                     <h2 className="text-azul text-xl text-center font-black mt-10">
                         No Hay Resultados
                     </h2>
                 )}
 
-                {selected.length > 0 && clientId && (
-                    <form
-                        className="space-y-1"
-                        onSubmit={handleSubmit(handleCreateCertificate)}
-                    >
-                        <CertificateNewForm
-                            register={register}
-                            errors={errors}
-                        />
-
-                        <div className="w-full overflow-x-auto py-5 flex flex-col gap-2">
-                            <Button
-                                variant="contained"
-                                color="success"
-                                size="small"
-                                disabled={isPending}
-                                type="submit"
-                                startIcon={<SaveIcon />}
-                            >
-                                Crear Certificado
-                            </Button>
-                        </div>
-                    </form>
-                )}
-
                 {data && data.manifests.length > 0 && (
-                    <ManifestCertificateTable
-                        manifests={data.manifests}
-                        onToggleManifest={handleToggleManifest}
-                        onToggleManifests={handleToggleManifests}
-                        selected={selected}
-                    />
-                )}
-
-                {data && (
-                    <ManifestCertificatePagination
-                        page={data.currentPage}
-                        totalPages={data.totalPages}
-                    />
+                    <>
+                        <CertificateManifestTable
+                            data={data}
+                            selectItem={selectItem}
+                            selectedState={selectedState}
+                        />
+                        <TablePagination
+                            component="div"
+                            count={data.totalPages}
+                            page={page}
+                            onPageChange={onChangePage}
+                            rowsPerPage={limit}
+                            onRowsPerPageChange={onChangeRowsPerPage}
+                            rowsPerPageOptions={[10, 20, 50]}
+                        />
+                    </>
                 )}
             </AccordionDetails>
         </Accordion>
+    );
+}
+
+type Props = {
+    data: PaginationManifestCertificateType;
+    selectedState: SelectedManifestItems
+    selectItem: (manifestItemId: number) => void
+    // onPageChange: (page: number) => void;
+};
+
+export function CertificateManifestTable({ data, selectItem, selectedState }: Props) {
+    // const [page, setPage] = useState(data.currentPage - 1);
+    const [openRow, setOpenRow] = useState<number | null>(null);
+
+    // const handleChangePage = (_: unknown, newPage: number) => {
+    //     setPage(newPage);
+    //     onPageChange(newPage + 1);
+    // };
+
+    return (
+        <Box sx={{ p: 2 }}>
+        <TableContainer>
+            <Table size="small" stickyHeader>
+            <TableHead>
+                <TableRow>
+                <TableCell sx={{ ...headerStyle, width: 60 }}>Items</TableCell>
+                <TableCell sx={{ ...headerStyle, width: 70 }}>ID</TableCell>
+                <TableCell sx={{ ...headerStyle, width: 100 }}>Cliente</TableCell>
+                <TableCell sx={{ ...headerStyle, width: 250 }}>Plantilla </TableCell>
+                <TableCell sx={{ ...headerStyle, width: 120 }}>Fecha</TableCell>
+                <TableCell sx={{ ...headerStyle, width: 100 }}>Ubicación </TableCell>
+                <TableCell sx={{ ...headerStyle, width: 100 }}>#-Cot</TableCell>
+                <TableCell sx={{ ...headerStyle, width: 100 }}>#-Fact</TableCell>
+                </TableRow>
+            </TableHead>
+            <TableBody sx={{ backgroundColor: "white" }}>
+                {data.manifests.map((manifest) => (
+                <React.Fragment key={manifest.id}>
+                    <TableRow>
+                    <TableCell>
+                        <IconButton
+                        size="small"
+                        onClick={() =>
+                            setOpenRow(openRow === manifest.id ? null : manifest.id)
+                        }
+                        >
+                        {openRow === manifest.id ? (
+                            <KeyboardArrowUpIcon />
+                        ) : (
+                            <KeyboardArrowDownIcon />
+                        )}
+                        </IconButton>
+                    </TableCell>
+                    <TableCell component="th" scope="row">
+                        {formatNumber(manifest.id)}
+                    </TableCell>
+                    <TableCell>
+                        <span className="uppercase">{manifest.cliente.alias}</span>
+                    </TableCell>
+                    <TableCell
+                        sx={{
+                        whiteSpace: "normal",
+                        wordBreak: "break-word",
+                        overflowWrap: "break-word",
+                        textTransform: "uppercase",
+                        }}
+                    >
+                        {manifest.manifestTemplate?.name}
+                    </TableCell>
+                    <TableCell>{formatDateTimeLarge(manifest.date)}</TableCell>
+                    <TableCell>{manifest.location ?? "Sin ubicación"}</TableCell>
+                    <TableCell>{manifest.quotationCode ?? "----"}</TableCell>
+                    <TableCell>{manifest.invoiceCode ?? "----"}</TableCell>
+                    </TableRow>
+                    <TableRow>
+                    <TableCell
+                        style={{ paddingBottom: 0, paddingTop: 0 }}
+                        colSpan={8}
+                    >
+                        <Collapse
+                        in={openRow === manifest.id}
+                        timeout="auto"
+                        unmountOnExit
+                        >
+                        <Box margin={1}>
+                            {/* Agrupar items por categoría */}
+                            {Object.entries(
+                            manifest.manifestItems.reduce<
+                                Record<string, typeof manifest.manifestItems>
+                            >((acc, item) => {
+                                const categoria =
+                                item.item.categoria || "Sin categoría";
+                                if (!acc[categoria]) acc[categoria] = [];
+                                acc[categoria].push(item);
+                                return acc;
+                            }, {})
+                            ).map(([categoria, items]) => {
+                            const isEspecial = categoria === "ESPECIAL";
+                            return (
+                                <Box key={categoria} sx={{ marginY: 1 }}>
+                                <h4 className="text-md text-center font-semibold p-2 bg-azul text-white print:bg-gray-200 print:text-black print:p-1 print:text-xs">
+                                    {categoria}
+                                </h4>
+                                <Table
+                                    size="small"
+                                    aria-label={`items-${categoria}`}
+                                    sx={{
+                                    tableLayout: "fixed",
+                                    width: "100%",
+                                    border: "1px solid #e5e7eb",
+                                    "& th, & td": {
+                                        padding: "4px 8px",
+                                        fontSize: "0.8rem",
+                                    },
+                                    }}
+                                >
+                                    <TableHead>
+                                    <TableRow>
+                                        <TableCell sx={{ ...headerStyle, width: 40 }}>✔</TableCell>
+                                        <TableCell
+                                        sx={{ ...headerStyle, width: 60 }}
+                                        >
+                                        Código
+                                        </TableCell>
+                                        <TableCell
+                                        sx={{ ...headerStyle, width: 220 }}
+                                        >
+                                        Nombre
+                                        </TableCell>
+                                        <TableCell
+                                        sx={{ ...headerStyle, width: 60 }}
+                                        >
+                                        Unidad
+                                        </TableCell>
+                                        <TableCell
+                                        sx={{ ...headerStyle, width: 80 }}
+                                        >
+                                        Cantidad
+                                        </TableCell>
+                                        {isEspecial && (
+                                        <TableCell
+                                            sx={{ ...headerStyle, width: 100 }}
+                                        >
+                                            Vol. Desechos
+                                        </TableCell>
+                                        )}
+                                        {isEspecial && (
+                                        <TableCell
+                                            sx={{ ...headerStyle, width: 80 }}
+                                        >
+                                            # Viajes
+                                        </TableCell>
+                                        )}
+                                        {isEspecial && (
+                                        <TableCell
+                                            sx={{ ...headerStyle, width: 80 }}
+                                        >
+                                            # Horas
+                                        </TableCell>
+                                        )}
+                                        <TableCell sx={{ ...headerStyle,  }}>Disposición Final</TableCell>
+                                        <TableCell
+                                        sx={{ ...headerStyle, width: 120 }}
+                                        >
+                                        Tiquete
+                                        </TableCell>
+                                        <TableCell
+                                        sx={{ ...headerStyle, width: 140 }}
+                                        >
+                                        Fecha Disp. Final
+                                        </TableCell>
+                                        <TableCell
+                                        sx={{ ...headerStyle, width: 120 }}
+                                        >
+                                        Certificado Final
+                                        </TableCell>
+                                    </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                    {items.map((item, idx) => (
+                                        <TableRow
+                                            key={item.id}
+                                            sx={{
+                                                backgroundColor: idx % 2 === 0 ? '#b0b3b8' : '#d1d5db', // gris alternado para hijos
+                                            }}
+                                        >
+                                        <TableCell>
+                                            <Checkbox
+                                            size="small"
+                                            checked={selectedState.itemIds.some(
+                                                (i) => i.manifestItemId === item.id
+                                            )}
+                                            onChange={() => selectItem(item.id)}
+                                            />
+                                        </TableCell>
+                                        <TableCell>{item.item.code}</TableCell>
+                                        <TableCell>
+                                            {" "}
+                                            <span className="uppercase text-sm">
+                                            {item.item.name}
+                                            </span>
+                                        </TableCell>
+                                        <TableCell>
+                                            {translateMedidasSimbolos(
+                                            item.item.unidad
+                                            )}
+                                        </TableCell>
+                                        <TableCell>{item.cantidad}</TableCell>
+                                        {isEspecial && (
+                                            <TableCell>
+                                            {item.volDesechos ?? "-"}
+                                            </TableCell>
+                                        )}
+                                        {isEspecial && (
+                                            <TableCell>
+                                            {item.nViajes ?? "-"}
+                                            </TableCell>
+                                        )}
+                                        {isEspecial && (
+                                            <TableCell>
+                                            {item.nHoras ?? "-"}
+                                            </TableCell>
+                                        )}
+                                        <TableCell>
+                                            <div className="flex flex-col text-xs gap-1 text-azul leading-tight">
+                                                <span className="font-semibold text-azul text-xs border-b">
+                                                    {item.disposicionFinal?.sitio?.nombre || "-"}
+                                                </span>
+                                                <span className="border-b">
+                                                    {item.disposicionFinal?.licencia?.licencia || "-"}
+                                                </span>
+                                                <span style={{color: '#374151'}}>
+                                                    {item.disposicionFinal?.tratamiento || "-"}
+                                                </span>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell>
+                                            {item.tiquete ?? "-"}
+                                        </TableCell>
+                                        <TableCell>
+                                            {item.fechaDisposicionFinal
+                                            ? formatDateTimeLarge(
+                                                item.fechaDisposicionFinal
+                                                )
+                                            : "-"}
+                                        </TableCell>
+                                        <TableCell>
+                                            {item.certificadoFinal ?? "-"}
+                                        </TableCell>
+                                        
+                                        </TableRow>
+                                    ))}
+                                    </TableBody>
+                                </Table>
+                                </Box>
+                            );
+                            })}
+                        </Box>
+                        </Collapse>
+                    </TableCell>
+                    </TableRow>
+                </React.Fragment>
+                ))}
+            </TableBody>
+            </Table>
+        </TableContainer>
+        {/* <TablePagination
+                    component="div"
+                    count={data.total}
+                    page={page}
+                    onPageChange={handleChangePage}
+                    rowsPerPage={10}
+                    rowsPerPageOptions={[10]}
+                /> */}
+        </Box>
     );
 }
 

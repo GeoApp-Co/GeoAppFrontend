@@ -14,7 +14,7 @@ function ManifestCertificatePagination( { page, totalPages } : ManifestCertifica
             {page > 1 && (
                 <Link
                     className="bg-white px-4 py-2 text-sm text-azul ring-1 ring-inset ring-gray-300 focus:z-20 focus:outline-offset-0"
-                    href={`/dashboard/certificado?pageManifest=${page - 1}`}
+                    href={`/dashboard/certificado?page=${page - 1}`}
                 >
                     &laquo;
                 </Link>
@@ -27,7 +27,7 @@ function ManifestCertificatePagination( { page, totalPages } : ManifestCertifica
                     <Link
                         key={currentPage}
                         className={`${page === currentPage ? 'font-black bg-azul text-white' : 'bg-white text-azul'}   px-4 py-2 text-sm ring-1 ring-inset ring-gray-300 focus:z-20 focus:outline-offset-0`}
-                        href={`/dashboard/certificado?pageManifest=${currentPage}`}
+                        href={`/dashboard/certificado?page=${currentPage}`}
                     >
                         {currentPage}
                     </Link>
@@ -53,7 +53,7 @@ function ManifestCertificatePagination( { page, totalPages } : ManifestCertifica
                     <Link
                         key={currentPage}
                         className={`${page === currentPage ? 'font-black bg-azul text-white' : 'bg-white text-azul'}   px-4 py-2 text-sm text-azul ring-1 ring-inset ring-gray-300 focus:z-20 focus:outline-offset-0`}
-                        href={`/dashboard/certificado?pageManifest=${currentPage}`}
+                        href={`/dashboard/certificado?page=${currentPage}`}
                     >
                         {currentPage}
                     </Link>
@@ -64,7 +64,7 @@ function ManifestCertificatePagination( { page, totalPages } : ManifestCertifica
                     <Link
                         key={currentPage}
                         className={`${page === currentPage ?'font-black bg-azul text-white' : 'bg-white text-azul'}   px-4 py-2 text-sm text-azul ring-1 ring-inset ring-gray-300 focus:z-20 focus:outline-offset-0`}
-                        href={`/dashboard/certificado?pageManifest=${currentPage}`}
+                        href={`/dashboard/certificado?page=${currentPage}`}
                     >
                         {currentPage}
                     </Link>
@@ -74,7 +74,7 @@ function ManifestCertificatePagination( { page, totalPages } : ManifestCertifica
             {page < totalPages && (
                 <Link
                     className="bg-white px-4 py-2 text-sm text-azul ring-1 ring-inset ring-gray-300 focus:z-20 focus:outline-offset-0"
-                    href={`/dashboard/certificado?pageManifest=${page + 1}`}
+                    href={`/dashboard/certificado?page=${page + 1}`}
                 >
                     &raquo;
                 </Link>
